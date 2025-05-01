@@ -1,0 +1,19 @@
+.main .block-container {
+    padding-top: 2rem;
+    max-width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.stButton>button {
+    border-radius: 20px;
+    padding: 0.5rem 2rem;
+}
+
+.nav-button-next {
+    float: right;
+}
+
+.nav-button-back {
+    float: left;
+}

@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stability of Support</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <style>
+        body {
+            background: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 20px;
+            width: 360px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        h2 {
+            color: #087e8b;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .summary {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #444;
+        }
+        .quotes {
+            margin-top: 10px;
+            width: 100%;
+            font-size: 0.9em;
+            color: #555;
+        }
+        .quote {
+            background: #e1f5fe;
+            margin: 6px 0;
+            padding: 10px;
+            border-radius: 8px;
+            position: relative;
+            padding-left: 30px;
+        }
+        .quote::before {
+            content: "💬";
+            position: absolute;
+            left: 8px;
+            top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Stability of Support</h2>
+    <div class="chart-container">
+        <canvas id="stabilitySupport"></canvas>
+    </div>
+    <div class="summary">Most supporters are stable but a significant minority could change.</div>
+    <div class="quotes">
+        
+    </div>
+</div>
+
+<script>
+new Chart(document.getElementById('stabilitySupport').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Stable Support', 'Could Change'],
+        datasets: [{
+            data: [55, 36],
+            backgroundColor: ['#4dd0e1', '#ff7043'],
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            borderRadius: 10,
+            borderSkipped: false
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: true, position: 'bottom' },
+            datalabels: {
+                color: '#000',
+                font: { weight: 'bold', size: 12 },
+                formatter: (value) => value + '%',
+                anchor: 'center',
+                align: 'center'
+            }
+        },
+        scales: {}
+    },
+    plugins: [ChartDataLabels]
+});
+</script>
+
+</body>
+</html>
