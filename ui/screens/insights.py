@@ -6,7 +6,9 @@ from pathlib import Path
 
 import streamlit as st
 
+from agents.crew import QuestionAnsweringCrew
 from ui.pdf import create_pdf
+from utils.pdf_reader import get_text
 
 
 def show_insights_screen():
@@ -250,7 +252,7 @@ def show_insights_screen():
         [data-testid="stTextInput"] {
             margin-top: 0 !important;
         }
-        
+
     </style>
     """, unsafe_allow_html=True)
 
@@ -269,6 +271,13 @@ def show_insights_screen():
     parent_root = package_root.parent.resolve()
     project_root = parent_root.parent.resolve()
     data_path = os.path.join(project_root, "data")
+
+    # Initialize HTML Assistant if it doesn't exist yet
+    if 'qna_agent' not in st.session_state:
+        report_path = os.path.join(data_path, "100 Days into Trump's 2nd Term.pdf")
+        if os.path.exists(report_path):
+            st.session_state.report_text = get_text(report_path)
+            st.session_state.qna_agent = QuestionAnsweringCrew().crew()
 
     # Sample HTML files for demonstration (replace with actual file paths)
     if 'html_files' not in st.session_state:
@@ -294,15 +303,30 @@ def show_insights_screen():
 
     def send_message():
         if st.session_state.user_input.strip():
+            user_question = st.session_state.user_input
+
             # Add user message to chat
             st.session_state.chat_messages.append({
                 "role": "user",
-                "content": st.session_state.user_input,
+                "content": user_question,
                 "timestamp": datetime.now().strftime("%H:%M:%S")
             })
 
-            # Simulate assistant response (replace with actual response logic)
-            response = f"This is a response to: {st.session_state.user_input}"
+            # Get response from HTMLAssistant if it exists
+            if st.session_state.qna_agent:
+                with st.spinner("Thinking..."):
+                    try:
+                        inputs = {
+                            'report': st.session_state.report_text,
+                            'question': user_question
+                        }
+                        response = st.session_state.qna_agent.kickoff(inputs)
+                    except Exception as e:
+                        response = f"Sorry, I encountered an error: {str(e)}. Please try again."
+            else:
+                response = "Sorry, I couldn't analyze the report. Please make sure the report.html file exists in the data directory."
+
+            # Add assistant response to chat
             st.session_state.chat_messages.append({
                 "role": "assistant",
                 "content": response,
@@ -324,8 +348,12 @@ def show_insights_screen():
 
         if direction == "prev" and current_index > 0:
             st.session_state.current_html_index[tab_to_use] -= 1
+            # Reset HTML assistant since we've changed files
+            st.session_state.qna_agent = None
         elif direction == "next" and current_index < max_index:
             st.session_state.current_html_index[tab_to_use] += 1
+            # Reset HTML assistant since we've changed files
+            st.session_state.qna_agent = None
 
     # NEW STRUCTURE: First create header container at the top level (outside any columns)
     header_container = st.container()
@@ -355,6 +383,7 @@ def show_insights_screen():
             # New Survey button
             with btn_cols[1]:
                 if st.button("New Survey", key="insights_back", use_container_width=True):
+                    # Note: HTML Assistant remains initialized
                     st.session_state.current_screen = 'survey'
                     st.rerun()
 
@@ -371,6 +400,14 @@ def show_insights_screen():
 
             # Create a container for the scrollable area
             with chat_container:
+                # Add a welcome message if chat is empty
+                if not st.session_state.chat_messages:
+                    st.session_state.chat_messages.append({
+                        "role": "assistant",
+                        "content": "Hello! I'm your Orion assistant. I can help answer questions about the HTML content you're viewing. What would you like to know?",
+                        "timestamp": datetime.now().strftime("%H:%M:%S")
+                    })
+
                 # Build chat messages HTML
                 messages_html = ""
                 for message in st.session_state.chat_messages:

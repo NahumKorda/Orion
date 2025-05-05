@@ -1,10 +1,17 @@
+from pathlib import Path
+
 import streamlit as st
 import os
+
+from dotenv import load_dotenv
+
 from ui.screens.survey import show_survey_screen
 from ui.screens.filters import show_filters_screen
 from ui.screens.questions import show_questions_screen
 from ui.screens.processing import show_processing_screen
 from ui.screens.insights import show_insights_screen
+
+load_dotenv()
 
 # Initialize session state variables if they don't exist
 if 'current_screen' not in st.session_state:

@@ -1,0 +1,7 @@
+answering_questions:
+  description: >
+    Analyze the provided report and answer the question about it.
+    If the question cannot be answered from the report, politely deny the answer and explain why.
+  expected_output: >
+    Plain text answer.
+  agent: business_analyst

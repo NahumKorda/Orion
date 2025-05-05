@@ -1,0 +1,475 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sentimate – Full Qualitative Dashboard</title>
+<style>
+    body { font-family: Arial, sans-serif; background: #f3f3f3; margin: 0; padding: 0; }
+    .container { max-width: 860px; margin: 0 auto; padding: 40px 20px; }
+    .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .card h3 { margin-top: 0; }
+    .chart { margin-top: 20px; }
+    canvas { max-width: 100%; height: 350px; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+<style>
+  body { font-family: Arial, sans-serif; background: #f3f3f3; margin: 0; padding: 0; }
+  .container { max-width: 860px; margin: 0 auto; padding: 40px 20px; }
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 40px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 30px;
+  }
+  .chart {
+    flex: 1 1 300px;
+    min-width: 280px;
+    max-width: 400px;
+  }
+  .text {
+    flex: 2 1 400px;
+    min-width: 320px;
+  }
+  h3 { margin-top: 0; }
+  canvas { width: 100%; height: 340px; }
+  .text p { margin: 0 0 12px; }
+  .text strong { display: block; margin-bottom: 4px; color: #333; }
+</style></head>
+<body>
+<div id="main-wrapper" style="transition: margin-right 0.3s ease;"><div class="container">
+<div class="card"><div class="text">
+<div class="section">
+<h2>Executive Summary</h2>
+<p>This qualitative analysis explores public sentiment regarding Donald Trump based on online discourse. The findings reflect a deeply polarized atmosphere where supporters and opponents not only hold opposing views but also speak from different emotional frameworks.</p>
+<p>Supporters highlight achievements in the economy, immigration enforcement, and strength of leadership, often expressing hope, pride, and a sense of restored identity. In contrast, opponents are driven by fear, frustration, and disillusionment, citing concerns over ethics, divisiveness, and instability.</p>
+<p>Swing voters are emotionally ambivalent. While some resonate with Trump's economic message, others remain skeptical, particularly when scandals or abrupt policy changes dominate headlines. Emotional tone—especially pride, anger, and anxiety—emerges as a significant predictor of opinion.</p>
+<p>These findings suggest that emotion-based messaging may be more effective than rational policy arguments, and that tone and symbolism should be central to strategic communication.</p>
+</div>
+</div></div>
+<div class="card">
+<div class="chart">
+<canvas id="chart1"></canvas>
+</div>
+<div class="text">
+<h3>What do people appreciate most about Trump's actions?</h3>
+<p><strong>Key Insight:</strong> Supporters most frequently mention immigration enforcement, tax cuts, and fulfilling campaign promises. These are seen as evidence of strength and integrity.</p>
+<p><strong>Representative Quotes:</strong><br/>- “He does what he says. That’s rare.”<br/>- “Finally someone is taking the border seriously.”</p>
+<p><strong>Emotional Tone:</strong> Pride, validation, and relief.</p>
+<p><strong>Interpretation:</strong> Trump’s appeal among supporters is closely tied to perceived decisiveness and delivery. His actions are evaluated more on symbolism and confrontation with ‘the system’ than on measurable outcomes.</p>
+</div>
+</div>
+<div class="card">
+<div class="chart">
+<canvas id="chart2"></canvas>
+</div>
+<div class="text">
+<h3>What concerns do people express about Trump's behavior?</h3>
+<p><strong>Key Insight:</strong> Critics point to impulsive decision-making, divisive rhetoric, and frequent scandals. Even some supporters admit discomfort with his tone.</p>
+<p><strong>Representative Quotes:</strong><br/>- “He says what he thinks, and that’s the problem.”<br/>- “I agree with the goals, but not the chaos.”</p>
+<p><strong>Emotional Tone:</strong> Frustration, fear, anxiety.</p>
+<p><strong>Interpretation:</strong> Tone is a major barrier. While his assertiveness energizes his base, it alienates moderates and reaffirms critics' worst assumptions.</p>
+</div>
+</div>
+<div class="card">
+<div class="chart">
+<canvas id="chart3"></canvas>
+</div>
+<div class="text">
+<h3>What issues most influence public support?</h3>
+<p><strong>Key Insight:</strong> The economy remains the most cited reason for support. Security and patriotism follow. For opponents, ethics and social division dominate.</p>
+<p><strong>Representative Quotes:</strong><br/>- “Jobs are back, that’s all that matters.”<br/>- “He’s destroying what makes America decent.”</p>
+<p><strong>Emotional Tone:</strong> Hope (supporters), moral outrage (opponents).</p>
+<p><strong>Interpretation:</strong> Voters prioritize personal economic well-being and identity. Perceived moral failings carry emotional weight but may not override pocketbook issues.</p>
+</div>
+</div>
+<div class="card">
+<div class="chart">
+<canvas id="chart4"></canvas>
+</div>
+<div class="text">
+<h3>What could cause people to reconsider their stance?</h3>
+<p><strong>Key Insight:</strong> For supporters, a major ethical scandal or economic crash would prompt doubt. For opponents, little could redeem him—trust is fundamentally broken.</p>
+<p><strong>Representative Quotes:</strong><br/>- “If he lied about something big, I’d have to rethink.”<br/>- “Nothing he does surprises me anymore.”</p>
+<p><strong>Emotional Tone:</strong> Guarded optimism, resignation.</p>
+<p><strong>Interpretation:</strong> Supporters are conditionally loyal. There is a tipping point. Opponents are hardened and unlikely to be swayed.</p>
+</div>
+</div>
+<div class="card">
+<div class="chart">
+<canvas id="chart5"></canvas>
+</div>
+<div class="text">
+<h3>How emotionally stable is the support?</h3>
+<p><strong>Key Insight:</strong> Roughly two-thirds of supporters show firm commitment, while one-third are described as “pragmatic believers.” Among opponents, emotional intensity is high, and flexibility is low.</p>
+<p><strong>Representative Quotes:</strong><br/>- “He’s not perfect, but better than the rest.”<br/>- “Never again. One term was too much.”</p>
+<p><strong>Emotional Tone:</strong> Mixed—determination vs. bitterness.</p>
+<p><strong>Interpretation:</strong> The election could turn not on persuasion, but on turnout and emotional activation.</p>
+</div>
+</div>
+<div class="card">
+<div class="chart">
+<canvas id="chart6"></canvas>
+</div>
+<div class="text">
+<h3>What leadership qualities do people most value in Trump?</h3>
+<p><strong>Key Insight:</strong> Supporters admire strength, defiance, and directness. Opponents critique the same traits as arrogance and recklessness.</p>
+<p><strong>Representative Quotes:</strong><br/>- “He fights. Finally.”<br/>- “He thinks being loud is being strong.”</p>
+<p><strong>Emotional Tone:</strong> Admiration vs. disdain.</p>
+<p><strong>Interpretation:</strong> Leadership perception is filtered through personal values: strength and loyalty vs. empathy and decorum.</p>
+</div>
+</div>
+<div class="card">
+<div class="chart">
+<canvas id="chart7"></canvas>
+</div>
+<div class="text">
+<h3>What emotions does Trump evoke?</h3>
+<p><strong>Key Insight:</strong> Emotions range from hope and pride to fear and disgust. Even among swing voters, the tone is highly charged.</p>
+<p><strong>Representative Quotes:</strong><br/>- “He gives me hope we won’t be ignored.”<br/>- “He makes my stomach turn.”</p>
+<p><strong>Emotional Tone:</strong> Extremely polarized.</p>
+<p><strong>Interpretation:</strong> Any campaign strategy must deal with this emotional baggage—either leveraging it or neutralizing it.</p>
+</div>
+</div>
+<div class="card">
+<div class="chart">
+<canvas id="chart8"></canvas>
+</div>
+<div class="text">
+<h3>Where do people get their impressions about Trump?</h3>
+<p><strong>Key Insight:</strong> Media, social platforms, and community echo chambers shape opinions significantly.</p>
+<p><strong>Interpretation:</strong> Understanding media sources can help target influential narratives and reshape perception.</p>
+</div>
+</div>
+<div class="card">
+<div class="chart">
+<canvas id="chart9"></canvas>
+</div>
+<div class="text">
+<h3>What comparisons do people make between Trump and other leaders?</h3>
+<p><strong>Key Insight:</strong> Trump is frequently compared to Reagan, Nixon, and populist foreign leaders like Bolsonaro or Putin.</p>
+<p><strong>Interpretation:</strong> Comparisons offer emotional shortcuts that help voters frame leadership styles positively or negatively.</p>
+</div>
+</div>
+<div class="card">
+<div class="chart">
+<canvas id="chart10"></canvas>
+</div>
+<div class="text">
+<h3>How do people describe Trump in one word?</h3>
+<p><strong>Key Insight:</strong> Responses vary from “Strong” and “Bold” to “Dangerous” and “Unstable.”</p>
+<p><strong>Interpretation:</strong> Single-word associations are powerful emotional branding tools—critical in campaign design.</p>
+</div>
+</div>
+<div class="card"><div class="text">
+<div class="section">
+<h2>Final Analysis</h2>
+<p>Trump represents more than policy — he is a symbol, a trigger, a proxy for deeper fears and hopes. Support and opposition to him operate on emotional terrain. The key to understanding voters is not just what they say, but how they feel.</p>
+</div>
+</div></div><div class="card"><div class="text">
+<div class="section">
+<h2>Strategic Recommendations</h2>
+<ul>
+<li><strong>Leverage Emotional Anchors:</strong> Campaigns should echo themes of pride, strength, and protection — but avoid arrogance and overpromising.</li>
+<li><strong>Moderate the Tone:</strong> If appealing to swing voters, adopt messaging that projects calm strength, not aggression.</li>
+<li><strong>Segment Messaging:</strong> Address supporters with reinforcement, critics with contrast, and swing voters with reassurance.</li>
+<li><strong>Monitor Trigger Points:</strong> Ethical issues and economic fears are pressure points. Be transparent and proactive.</li>
+<li><strong>Simplify the Symbol:</strong> Use visuals and metaphors that align Trump with "action" and opponents with "stagnation" — or vice versa, depending on narrative.</li>
+</ul>
+</div>
+</div></div>
+<script>
+Chart.register(ChartDataLabels);
+function createCharts() {
+  
+new Chart(document.getElementById('chart1'), {
+  type: 'bar',
+  data: {
+    labels: ["Immigration", "Tax Cuts", "Promises Kept"],
+    datasets: [{
+      data: [45, 30, 25],
+      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
+      borderRadius: 10
+    }]
+  },
+  options: {
+    plugins: {
+      datalabels: {
+        color: '#fff',
+        font: { weight: 'bold' },
+        formatter: value => value + '%'
+      },
+      legend: { position: 'bottom' }
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  }
+});
+
+new Chart(document.getElementById('chart2'), {
+  type: 'pie',
+  data: {
+    labels: ["Tone", "Division", "Scandals"],
+    datasets: [{
+      data: [40, 35, 25],
+      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
+      borderRadius: 10
+    }]
+  },
+  options: {
+    plugins: {
+      datalabels: {
+        color: '#fff',
+        font: { weight: 'bold' },
+        formatter: value => value + '%'
+      },
+      legend: { position: 'bottom' }
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  }
+});
+
+new Chart(document.getElementById('chart3'), {
+  type: 'bar',
+  data: {
+    labels: ["Economy", "Security", "Patriotism"],
+    datasets: [{
+      data: [50, 30, 20],
+      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
+      borderRadius: 10
+    }]
+  },
+  options: {
+    plugins: {
+      datalabels: {
+        color: '#fff',
+        font: { weight: 'bold' },
+        formatter: value => value + '%'
+      },
+      legend: { position: 'bottom' }
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  }
+});
+
+new Chart(document.getElementById('chart4'), {
+  type: 'doughnut',
+  data: {
+    labels: ["Scandal", "Economic Crash", "Nothing"],
+    datasets: [{
+      data: [40, 35, 25],
+      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
+      borderRadius: 10
+    }]
+  },
+  options: {
+    plugins: {
+      datalabels: {
+        color: '#fff',
+        font: { weight: 'bold' },
+        formatter: value => value + '%'
+      },
+      legend: { position: 'bottom' }
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  }
+});
+
+new Chart(document.getElementById('chart5'), {
+  type: 'bar',
+  data: {
+    labels: ["Core Supporters", "Pragmatic Believers", "Undecided"],
+    datasets: [{
+      data: [65, 25, 10],
+      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
+      borderRadius: 10
+    }]
+  },
+  options: {
+    plugins: {
+      datalabels: {
+        color: '#fff',
+        font: { weight: 'bold' },
+        formatter: value => value + '%'
+      },
+      legend: { position: 'bottom' }
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  }
+});
+
+new Chart(document.getElementById('chart6'), {
+  type: 'bar',
+  data: {
+    labels: ["Strength", "Defiance", "Directness"],
+    datasets: [{
+      data: [50, 30, 20],
+      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
+      borderRadius: 10
+    }]
+  },
+  options: {
+    plugins: {
+      datalabels: {
+        color: '#fff',
+        font: { weight: 'bold' },
+        formatter: value => value + '%'
+      },
+      legend: { position: 'bottom' }
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  }
+});
+
+new Chart(document.getElementById('chart7'), {
+  type: 'radar',
+  data: {
+    labels: ["Hope", "Pride", "Fear", "Disgust"],
+    datasets: [{
+      data: [35, 30, 25, 10],
+      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
+      borderRadius: 10
+    }]
+  },
+  options: {
+    plugins: {
+      datalabels: {
+        color: '#fff',
+        font: { weight: 'bold' },
+        formatter: value => value + '%'
+      },
+      legend: { position: 'bottom' }
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  }
+});
+
+new Chart(document.getElementById('chart8'), {
+  type: 'bar',
+  data: {
+    labels: ["TV News", "Social Media", "Peers"],
+    datasets: [{
+      data: [40, 35, 25],
+      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
+      borderRadius: 10
+    }]
+  },
+  options: {
+    plugins: {
+      datalabels: {
+        color: '#fff',
+        font: { weight: 'bold' },
+        formatter: value => value + '%'
+      },
+      legend: { position: 'bottom' }
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  }
+});
+
+new Chart(document.getElementById('chart9'), {
+  type: 'bar',
+  data: {
+    labels: ["Reagan", "Putin", "Nixon", "Other"],
+    datasets: [{
+      data: [30, 25, 25, 20],
+      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
+      borderRadius: 10
+    }]
+  },
+  options: {
+    plugins: {
+      datalabels: {
+        color: '#fff',
+        font: { weight: 'bold' },
+        formatter: value => value + '%'
+      },
+      legend: { position: 'bottom' }
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  }
+});
+
+new Chart(document.getElementById('chart10'), {
+  type: 'bar',
+  data: {
+    labels: ["Strong", "Bold", "Dangerous", "Unstable"],
+    datasets: [{
+      data: [35, 30, 20, 15],
+      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
+      borderRadius: 10
+    }]
+  },
+  options: {
+    plugins: {
+      datalabels: {
+        color: '#fff',
+        font: { weight: 'bold' },
+        formatter: value => value + '%'
+      },
+      legend: { position: 'bottom' }
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  }
+});
+
+}
+window.onload = createCharts;
+</script>
+</div></div>
+<!-- Chat Toggle Button -->
+<button onclick="toggleChat()" style="position: fixed; bottom: 20px; right: 20px; background-color: #2196f3; color: white; border: none; padding: 14px 28px; border-radius: 28px; font-size: 16px; cursor: pointer; z-index: 10000;">💬 Chat</button>
+<!-- Chat Panel -->
+<div id="chat-panel" style="display: none; position: fixed; top: 0; right: 0; width: 360px; height: 100%; background: #ffffff; border-left: 1px solid #ccc; box-shadow: -4px 0 12px rgba(0,0,0,0.2); padding: 16px; z-index: 10000;"><button onclick="toggleChat()" style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 20px; cursor: pointer; z-index: 10001;">×</button>
+<h4 style="margin-top: 0;">AI Discussion</h4>
+<div id="chat-box" style="height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 8px; font-size: 14px; margin-bottom: 8px;"></div>
+<textarea id="chat-input" placeholder="Ask something..." style="width: 100%; height: 60px; font-size: 14px; padding: 6px;"></textarea>
+<button onclick="sendChat()" style="width: 100%; margin-top: 6px;">Send</button>
+</div>
+
+
+<script>
+function toggleChat() {
+  const panel = document.getElementById("chat-panel");
+  const wrapper = document.getElementById("main-wrapper");
+  const isOpen = panel.style.display === "block";
+  panel.style.display = isOpen ? "none" : "block";
+  if (wrapper) {
+    wrapper.style.marginRight = isOpen ? "0" : "360px";
+  }
+}
+
+function sendChat() {
+  const input = document.getElementById("chat-input");
+  const chatBox = document.getElementById("chat-box");
+  const message = input.value.trim();
+  if (!message) return;
+  const userMsg = document.createElement("div");
+  userMsg.innerHTML = "<strong>You:</strong> " + message;
+  chatBox.appendChild(userMsg);
+  const botMsg = document.createElement("div");
+  botMsg.innerHTML = "<strong>AI:</strong> (Simulated response to: '" + message + "')";
+  chatBox.appendChild(botMsg);
+  input.value = '';
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+</script>
+</body>
+</html>
