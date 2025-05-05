@@ -1,475 +1,214 @@
-
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Sentimate – Full Qualitative Dashboard</title>
-<style>
-    body { font-family: Arial, sans-serif; background: #f3f3f3; margin: 0; padding: 0; }
-    .container { max-width: 860px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-    .card h3 { margin-top: 0; }
-    .chart { margin-top: 20px; }
-    canvas { max-width: 100%; height: 350px; }
-</style>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-<style>
-  body { font-family: Arial, sans-serif; background: #f3f3f3; margin: 0; padding: 0; }
-  .container { max-width: 860px; margin: 0 auto; padding: 40px 20px; }
-  .card {
-    background: white;
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 40px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 30px;
-  }
-  .chart {
-    flex: 1 1 300px;
-    min-width: 280px;
-    max-width: 400px;
-  }
-  .text {
-    flex: 2 1 400px;
-    min-width: 320px;
-  }
-  h3 { margin-top: 0; }
-  canvas { width: 100%; height: 340px; }
-  .text p { margin: 0 0 12px; }
-  .text strong { display: block; margin-bottom: 4px; color: #333; }
-</style></head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentimate Insights Dashboard</title>
+  <!-- Chart.js and DataLabels plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f9; margin: 0; padding: 0; }
+    header { background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+    nav.container { display: flex; align-items: center; padding: 10px 20px; }
+    nav .logo { height: 40px; margin-right: auto; }
+    nav a { margin-left: 20px; color: #0b3954; text-decoration: none; font-weight: bold; }
+    .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; transition: margin-right 0.3s ease; }
+    .dashboard.chat-open .container { margin-right: 350px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 20px; display: flex; flex-direction: column; }
+    .card h2 { font-size: 1.1em; margin: 0 0 8px; color: #087e8b; }
+    .summary { font-size: 0.9em; color: #444; margin: 10px 0; }
+    .chart-container { width: 100%; height: 160px; margin-bottom: 8px; }
+    .chart-data { font-size: 0.8em; color: #333; margin-bottom: 8px; }
+    canvas { max-width: 100%; max-height: 160px; }
+    .quotes { margin: 8px 0; }
+    .quote { background: #e1f5fe; padding: 6px; border-left: 4px solid #007BFF; margin-bottom: 4px; border-radius: 6px; font-style: italic; font-size: 0.75em; }
+    .expand-button { background: none; border: none; color: #007BFF; cursor: pointer; font-size: 0.85em; padding: 0; margin-top: 6px; align-self: flex-start; }
+    .expanded-content { display: none; margin-top: 10px; font-size: 0.85em; color: #333; }
+    .expanded-content h3 { margin-top: 12px; color: #005b96; font-size: 0.9em; }
+    .expanded-content p { margin-bottom: 8px; }
+    .section { margin-top: 40px; }
+    .section h2 { color: #0b3954; margin-bottom: 20px; }
+    .section ul { font-size: 0.9em; color: #444; list-style: disc; margin-left: 20px; }
+    .dashboard { display: flex; }
+    .chat-panel { width: 350px; background: #fff; border-left: 1px solid #ddd; position: fixed; right: 0; top: 0; bottom: 0; transform: translateX(100%); transition: transform 0.3s ease; display: flex; flex-direction: column; z-index: 200; }
+    .chat-panel.open { transform: translateX(0); }
+    .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f8f9fa; }
+    .chat-header button { background: none; border: none; font-size: 1.2em; cursor: pointer; }
+    .chat-body { flex: 1; padding: 12px; overflow-y: auto; }
+    .chat-input { display: flex; border-top: 1px solid #ddd; padding: 8px; }
+    .chat-input input { flex: 1; padding: 8px; border-radius: 20px; border: 1px solid #ccc; }
+    .chat-input button { margin-left: 8px; background: #007BFF; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; }
+    .chat-toggle { position: fixed; right: 20px; bottom: 20px; background: #007BFF; color: #fff; padding: 12px 28px; cursor: pointer; border-radius: 28px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); font-size: 1em; z-index: 201; }
+  </style>
+</head>
 <body>
-<div id="main-wrapper" style="transition: margin-right 0.3s ease;"><div class="container">
-<div class="card"><div class="text">
-<div class="section">
-<h2>Executive Summary</h2>
-<p>This qualitative analysis explores public sentiment regarding Donald Trump based on online discourse. The findings reflect a deeply polarized atmosphere where supporters and opponents not only hold opposing views but also speak from different emotional frameworks.</p>
-<p>Supporters highlight achievements in the economy, immigration enforcement, and strength of leadership, often expressing hope, pride, and a sense of restored identity. In contrast, opponents are driven by fear, frustration, and disillusionment, citing concerns over ethics, divisiveness, and instability.</p>
-<p>Swing voters are emotionally ambivalent. While some resonate with Trump's economic message, others remain skeptical, particularly when scandals or abrupt policy changes dominate headlines. Emotional tone—especially pride, anger, and anxiety—emerges as a significant predictor of opinion.</p>
-<p>These findings suggest that emotion-based messaging may be more effective than rational policy arguments, and that tone and symbolism should be central to strategic communication.</p>
-</div>
-</div></div>
-<div class="card">
-<div class="chart">
-<canvas id="chart1"></canvas>
-</div>
-<div class="text">
-<h3>What do people appreciate most about Trump's actions?</h3>
-<p><strong>Key Insight:</strong> Supporters most frequently mention immigration enforcement, tax cuts, and fulfilling campaign promises. These are seen as evidence of strength and integrity.</p>
-<p><strong>Representative Quotes:</strong><br/>- “He does what he says. That’s rare.”<br/>- “Finally someone is taking the border seriously.”</p>
-<p><strong>Emotional Tone:</strong> Pride, validation, and relief.</p>
-<p><strong>Interpretation:</strong> Trump’s appeal among supporters is closely tied to perceived decisiveness and delivery. His actions are evaluated more on symbolism and confrontation with ‘the system’ than on measurable outcomes.</p>
-</div>
-</div>
-<div class="card">
-<div class="chart">
-<canvas id="chart2"></canvas>
-</div>
-<div class="text">
-<h3>What concerns do people express about Trump's behavior?</h3>
-<p><strong>Key Insight:</strong> Critics point to impulsive decision-making, divisive rhetoric, and frequent scandals. Even some supporters admit discomfort with his tone.</p>
-<p><strong>Representative Quotes:</strong><br/>- “He says what he thinks, and that’s the problem.”<br/>- “I agree with the goals, but not the chaos.”</p>
-<p><strong>Emotional Tone:</strong> Frustration, fear, anxiety.</p>
-<p><strong>Interpretation:</strong> Tone is a major barrier. While his assertiveness energizes his base, it alienates moderates and reaffirms critics' worst assumptions.</p>
-</div>
-</div>
-<div class="card">
-<div class="chart">
-<canvas id="chart3"></canvas>
-</div>
-<div class="text">
-<h3>What issues most influence public support?</h3>
-<p><strong>Key Insight:</strong> The economy remains the most cited reason for support. Security and patriotism follow. For opponents, ethics and social division dominate.</p>
-<p><strong>Representative Quotes:</strong><br/>- “Jobs are back, that’s all that matters.”<br/>- “He’s destroying what makes America decent.”</p>
-<p><strong>Emotional Tone:</strong> Hope (supporters), moral outrage (opponents).</p>
-<p><strong>Interpretation:</strong> Voters prioritize personal economic well-being and identity. Perceived moral failings carry emotional weight but may not override pocketbook issues.</p>
-</div>
-</div>
-<div class="card">
-<div class="chart">
-<canvas id="chart4"></canvas>
-</div>
-<div class="text">
-<h3>What could cause people to reconsider their stance?</h3>
-<p><strong>Key Insight:</strong> For supporters, a major ethical scandal or economic crash would prompt doubt. For opponents, little could redeem him—trust is fundamentally broken.</p>
-<p><strong>Representative Quotes:</strong><br/>- “If he lied about something big, I’d have to rethink.”<br/>- “Nothing he does surprises me anymore.”</p>
-<p><strong>Emotional Tone:</strong> Guarded optimism, resignation.</p>
-<p><strong>Interpretation:</strong> Supporters are conditionally loyal. There is a tipping point. Opponents are hardened and unlikely to be swayed.</p>
-</div>
-</div>
-<div class="card">
-<div class="chart">
-<canvas id="chart5"></canvas>
-</div>
-<div class="text">
-<h3>How emotionally stable is the support?</h3>
-<p><strong>Key Insight:</strong> Roughly two-thirds of supporters show firm commitment, while one-third are described as “pragmatic believers.” Among opponents, emotional intensity is high, and flexibility is low.</p>
-<p><strong>Representative Quotes:</strong><br/>- “He’s not perfect, but better than the rest.”<br/>- “Never again. One term was too much.”</p>
-<p><strong>Emotional Tone:</strong> Mixed—determination vs. bitterness.</p>
-<p><strong>Interpretation:</strong> The election could turn not on persuasion, but on turnout and emotional activation.</p>
-</div>
-</div>
-<div class="card">
-<div class="chart">
-<canvas id="chart6"></canvas>
-</div>
-<div class="text">
-<h3>What leadership qualities do people most value in Trump?</h3>
-<p><strong>Key Insight:</strong> Supporters admire strength, defiance, and directness. Opponents critique the same traits as arrogance and recklessness.</p>
-<p><strong>Representative Quotes:</strong><br/>- “He fights. Finally.”<br/>- “He thinks being loud is being strong.”</p>
-<p><strong>Emotional Tone:</strong> Admiration vs. disdain.</p>
-<p><strong>Interpretation:</strong> Leadership perception is filtered through personal values: strength and loyalty vs. empathy and decorum.</p>
-</div>
-</div>
-<div class="card">
-<div class="chart">
-<canvas id="chart7"></canvas>
-</div>
-<div class="text">
-<h3>What emotions does Trump evoke?</h3>
-<p><strong>Key Insight:</strong> Emotions range from hope and pride to fear and disgust. Even among swing voters, the tone is highly charged.</p>
-<p><strong>Representative Quotes:</strong><br/>- “He gives me hope we won’t be ignored.”<br/>- “He makes my stomach turn.”</p>
-<p><strong>Emotional Tone:</strong> Extremely polarized.</p>
-<p><strong>Interpretation:</strong> Any campaign strategy must deal with this emotional baggage—either leveraging it or neutralizing it.</p>
-</div>
-</div>
-<div class="card">
-<div class="chart">
-<canvas id="chart8"></canvas>
-</div>
-<div class="text">
-<h3>Where do people get their impressions about Trump?</h3>
-<p><strong>Key Insight:</strong> Media, social platforms, and community echo chambers shape opinions significantly.</p>
-<p><strong>Interpretation:</strong> Understanding media sources can help target influential narratives and reshape perception.</p>
-</div>
-</div>
-<div class="card">
-<div class="chart">
-<canvas id="chart9"></canvas>
-</div>
-<div class="text">
-<h3>What comparisons do people make between Trump and other leaders?</h3>
-<p><strong>Key Insight:</strong> Trump is frequently compared to Reagan, Nixon, and populist foreign leaders like Bolsonaro or Putin.</p>
-<p><strong>Interpretation:</strong> Comparisons offer emotional shortcuts that help voters frame leadership styles positively or negatively.</p>
-</div>
-</div>
-<div class="card">
-<div class="chart">
-<canvas id="chart10"></canvas>
-</div>
-<div class="text">
-<h3>How do people describe Trump in one word?</h3>
-<p><strong>Key Insight:</strong> Responses vary from “Strong” and “Bold” to “Dangerous” and “Unstable.”</p>
-<p><strong>Interpretation:</strong> Single-word associations are powerful emotional branding tools—critical in campaign design.</p>
-</div>
-</div>
-<div class="card"><div class="text">
-<div class="section">
-<h2>Final Analysis</h2>
-<p>Trump represents more than policy — he is a symbol, a trigger, a proxy for deeper fears and hopes. Support and opposition to him operate on emotional terrain. The key to understanding voters is not just what they say, but how they feel.</p>
-</div>
-</div></div><div class="card"><div class="text">
-<div class="section">
-<h2>Strategic Recommendations</h2>
-<ul>
-<li><strong>Leverage Emotional Anchors:</strong> Campaigns should echo themes of pride, strength, and protection — but avoid arrogance and overpromising.</li>
-<li><strong>Moderate the Tone:</strong> If appealing to swing voters, adopt messaging that projects calm strength, not aggression.</li>
-<li><strong>Segment Messaging:</strong> Address supporters with reinforcement, critics with contrast, and swing voters with reassurance.</li>
-<li><strong>Monitor Trigger Points:</strong> Ethical issues and economic fears are pressure points. Be transparent and proactive.</li>
-<li><strong>Simplify the Symbol:</strong> Use visuals and metaphors that align Trump with "action" and opponents with "stagnation" — or vice versa, depending on narrative.</li>
-</ul>
-</div>
-</div></div>
-<script>
-Chart.register(ChartDataLabels);
-function createCharts() {
-  
-new Chart(document.getElementById('chart1'), {
-  type: 'bar',
-  data: {
-    labels: ["Immigration", "Tax Cuts", "Promises Kept"],
-    datasets: [{
-      data: [45, 30, 25],
-      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
-      borderRadius: 10
-    }]
-  },
-  options: {
-    plugins: {
-      datalabels: {
-        color: '#fff',
-        font: { weight: 'bold' },
-        formatter: value => value + '%'
-      },
-      legend: { position: 'bottom' }
-    },
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
-
-new Chart(document.getElementById('chart2'), {
-  type: 'pie',
-  data: {
-    labels: ["Tone", "Division", "Scandals"],
-    datasets: [{
-      data: [40, 35, 25],
-      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
-      borderRadius: 10
-    }]
-  },
-  options: {
-    plugins: {
-      datalabels: {
-        color: '#fff',
-        font: { weight: 'bold' },
-        formatter: value => value + '%'
-      },
-      legend: { position: 'bottom' }
-    },
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
-
-new Chart(document.getElementById('chart3'), {
-  type: 'bar',
-  data: {
-    labels: ["Economy", "Security", "Patriotism"],
-    datasets: [{
-      data: [50, 30, 20],
-      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
-      borderRadius: 10
-    }]
-  },
-  options: {
-    plugins: {
-      datalabels: {
-        color: '#fff',
-        font: { weight: 'bold' },
-        formatter: value => value + '%'
-      },
-      legend: { position: 'bottom' }
-    },
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
-
-new Chart(document.getElementById('chart4'), {
-  type: 'doughnut',
-  data: {
-    labels: ["Scandal", "Economic Crash", "Nothing"],
-    datasets: [{
-      data: [40, 35, 25],
-      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
-      borderRadius: 10
-    }]
-  },
-  options: {
-    plugins: {
-      datalabels: {
-        color: '#fff',
-        font: { weight: 'bold' },
-        formatter: value => value + '%'
-      },
-      legend: { position: 'bottom' }
-    },
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
-
-new Chart(document.getElementById('chart5'), {
-  type: 'bar',
-  data: {
-    labels: ["Core Supporters", "Pragmatic Believers", "Undecided"],
-    datasets: [{
-      data: [65, 25, 10],
-      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
-      borderRadius: 10
-    }]
-  },
-  options: {
-    plugins: {
-      datalabels: {
-        color: '#fff',
-        font: { weight: 'bold' },
-        formatter: value => value + '%'
-      },
-      legend: { position: 'bottom' }
-    },
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
-
-new Chart(document.getElementById('chart6'), {
-  type: 'bar',
-  data: {
-    labels: ["Strength", "Defiance", "Directness"],
-    datasets: [{
-      data: [50, 30, 20],
-      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
-      borderRadius: 10
-    }]
-  },
-  options: {
-    plugins: {
-      datalabels: {
-        color: '#fff',
-        font: { weight: 'bold' },
-        formatter: value => value + '%'
-      },
-      legend: { position: 'bottom' }
-    },
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
-
-new Chart(document.getElementById('chart7'), {
-  type: 'radar',
-  data: {
-    labels: ["Hope", "Pride", "Fear", "Disgust"],
-    datasets: [{
-      data: [35, 30, 25, 10],
-      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
-      borderRadius: 10
-    }]
-  },
-  options: {
-    plugins: {
-      datalabels: {
-        color: '#fff',
-        font: { weight: 'bold' },
-        formatter: value => value + '%'
-      },
-      legend: { position: 'bottom' }
-    },
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
-
-new Chart(document.getElementById('chart8'), {
-  type: 'bar',
-  data: {
-    labels: ["TV News", "Social Media", "Peers"],
-    datasets: [{
-      data: [40, 35, 25],
-      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
-      borderRadius: 10
-    }]
-  },
-  options: {
-    plugins: {
-      datalabels: {
-        color: '#fff',
-        font: { weight: 'bold' },
-        formatter: value => value + '%'
-      },
-      legend: { position: 'bottom' }
-    },
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
-
-new Chart(document.getElementById('chart9'), {
-  type: 'bar',
-  data: {
-    labels: ["Reagan", "Putin", "Nixon", "Other"],
-    datasets: [{
-      data: [30, 25, 25, 20],
-      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
-      borderRadius: 10
-    }]
-  },
-  options: {
-    plugins: {
-      datalabels: {
-        color: '#fff',
-        font: { weight: 'bold' },
-        formatter: value => value + '%'
-      },
-      legend: { position: 'bottom' }
-    },
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
-
-new Chart(document.getElementById('chart10'), {
-  type: 'bar',
-  data: {
-    labels: ["Strong", "Bold", "Dangerous", "Unstable"],
-    datasets: [{
-      data: [35, 30, 20, 15],
-      backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#f44336', '#9c27b0'],
-      borderRadius: 10
-    }]
-  },
-  options: {
-    plugins: {
-      datalabels: {
-        color: '#fff',
-        font: { weight: 'bold' },
-        formatter: value => value + '%'
-      },
-      legend: { position: 'bottom' }
-    },
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
-
-}
-window.onload = createCharts;
-</script>
-</div></div>
-<!-- Chat Toggle Button -->
-<button onclick="toggleChat()" style="position: fixed; bottom: 20px; right: 20px; background-color: #2196f3; color: white; border: none; padding: 14px 28px; border-radius: 28px; font-size: 16px; cursor: pointer; z-index: 10000;">💬 Chat</button>
-<!-- Chat Panel -->
-<div id="chat-panel" style="display: none; position: fixed; top: 0; right: 0; width: 360px; height: 100%; background: #ffffff; border-left: 1px solid #ccc; box-shadow: -4px 0 12px rgba(0,0,0,0.2); padding: 16px; z-index: 10000;"><button onclick="toggleChat()" style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 20px; cursor: pointer; z-index: 10001;">×</button>
-<h4 style="margin-top: 0;">AI Discussion</h4>
-<div id="chat-box" style="height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 8px; font-size: 14px; margin-bottom: 8px;"></div>
-<textarea id="chat-input" placeholder="Ask something..." style="width: 100%; height: 60px; font-size: 14px; padding: 6px;"></textarea>
-<button onclick="sendChat()" style="width: 100%; margin-top: 6px;">Send</button>
-</div>
-
-
-<script>
-function toggleChat() {
-  const panel = document.getElementById("chat-panel");
-  const wrapper = document.getElementById("main-wrapper");
-  const isOpen = panel.style.display === "block";
-  panel.style.display = isOpen ? "none" : "block";
-  if (wrapper) {
-    wrapper.style.marginRight = isOpen ? "0" : "360px";
-  }
-}
-
-function sendChat() {
-  const input = document.getElementById("chat-input");
-  const chatBox = document.getElementById("chat-box");
-  const message = input.value.trim();
-  if (!message) return;
-  const userMsg = document.createElement("div");
-  userMsg.innerHTML = "<strong>You:</strong> " + message;
-  chatBox.appendChild(userMsg);
-  const botMsg = document.createElement("div");
-  botMsg.innerHTML = "<strong>AI:</strong> (Simulated response to: '" + message + "')";
-  chatBox.appendChild(botMsg);
-  input.value = '';
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-</script>
+  <header>
+    <nav class="container">
+      <img src="logo.png" alt="Sentimate Logo" class="logo">
+      <a href="#executive">Executive</a>
+      <a href="#insights">Qualitative</a>
+      <a href="#quantitative">Quantitative</a>
+      <a href="#analysis">Summary</a>
+      <a href="#recommendations">Recommendations</a>
+    </nav>
+  </header>
+  <div class="dashboard" id="dashboard">
+    <div class="container">
+      <!-- Executive -->
+      <section id="executive" class="section">
+        <h2>Executive Overview</h2>
+        <p class="summary"><strong>Survey:</strong> 1,200 U.S. adults, April–May 2025</p>
+        <p class="summary">Approval fell from <strong>49%</strong> to <strong>42%</strong> in first 100 days:</p>
+        <ul>
+          <li>18–29 <strong>(–12 pts)</strong>: debt relief & climate concerns</li>
+          <li>Independents <strong>(–9 pts)</strong>: messaging inconsistency</li>
+          <li>Economic confidence <strong>45%</strong>: six-year low</li>
+          <li>Healthcare rural <strong>&lt;38%</strong>: access & cost</li>
+          <li>Foreign policy <strong>&lt;40%</strong>: diplomatic skepticism</li>
+        </ul>
+      </section>
+      <!-- Qualitative -->
+      <section id="insights" class="section">
+        <h2>Qualitative Insights</h2>
+        <div class="grid" id="insightsGrid"></div>
+      </section>
+      <!-- Quantitative -->
+      <section id="quantitative" class="section">
+        <h2>Quantitative Results</h2>
+        <div class="grid" id="quantGrid"></div>
+      </section>
+      <!-- Summary -->
+      <section id="analysis" class="section">
+        <h2>Detailed Summary</h2>
+        <ul>
+          <li><strong>Youth & Independents:</strong> trust erosion –12, –9 pts</li>
+          <li><strong>Economic:</strong> 55% feel worse, 45% confidence</li>
+          <li><strong>Healthcare:</strong> rural 42% vs urban 35%</li>
+          <li><strong>Foreign Policy:</strong> &lt;40% approval</li>
+        </ul>
+      </section>
+      <!-- Recommendations -->
+      <section id="recommendations" class="section">
+        <h2>Strategic Recommendations</h2>
+        <ul>
+          <li>Unified messaging: economy, healthcare, climate</li>
+          <li>Youth campaigns: debt relief & green jobs</li>
+          <li>Monthly bipartisan highlights</li>
+          <li>Regional tailored narratives</li>
+        </ul>
+      </section>
+    </div>
+    <!-- Chat -->
+    <div class="chat-panel" id="chatPanel">
+      <div class="chat-header">AI Agent <button onclick="toggleChat()">×</button></div>
+      <div class="chat-body" id="chatBody"></div>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Ask a question...">
+        <button id="sendBtn">Send</button>
+      </div>
+    </div>
+    <div class="chat-toggle" id="chatToggle">Ask a Question</div>
+  </div>
+  <script>
+    function toggleChat() {
+      const panel = document.getElementById('chatPanel'),
+            dash = document.getElementById('dashboard'),
+            tog = document.getElementById('chatToggle');
+      panel.classList.toggle('open');
+      dash.classList.toggle('chat-open');
+      tog.style.display = panel.classList.contains('open') ? 'none' : 'block';
+    }
+    document.getElementById('chatToggle').addEventListener('click', toggleChat);
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      const msg = document.getElementById('chatInput').value.trim();
+      if (!msg) return;
+      const body = document.getElementById('chatBody'),
+            pu = document.createElement('p');
+      pu.className = 'user';
+      pu.textContent = msg;
+      body.appendChild(pu);
+      document.getElementById('chatInput').value = '';
+      const pb = document.createElement('p');
+      pb.className = 'bot';
+      pb.textContent = 'AI Agent is typing...';
+      body.appendChild(pb);
+      setTimeout(() => { pb.textContent = 'Insightful response: ' + msg; }, 1000);
+    });
+    function toggleExpand(btn) {
+      const c = btn.nextElementSibling;
+      c.style.display = c.style.display === 'block' ? 'none' : 'block';
+      btn.textContent = c.style.display === 'block' ? 'Hide Details' : 'View More';
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      Chart.register(ChartDataLabels);
+      const colors = ['#00BCD4','#8BC34A','#FF9800','#FF6384','#36A2EB','#FFCE56'];
+      const types = ['doughnut','bar','pie','line'];
+      // Qualitative data
+      const qualitative = [
+        {id:1,title:'Overall Job Approval',summary:'Division deep, youth most critical of performance.',quotes:['“Flip-flops confuse voters.”','“Daily economic pinch felt.”','“Diplomatic stance inconsistent.”'],detailChart:[45,25,30],detailText:'Unpredictable policy announcements undermine trust, especially on trade and environment.',breakdownLabels:['Republicans','Independents','Democrats'],breakdownValues:[65,40,20]},
+        {id:2,title:'Economic Confidence',summary:'Lowest in six years amid cost pressures.',quotes:['“Prices outpace paychecks.”','“Healthcare bills stress me.”','“Saving seems impossible.”'],detailChart:[20,25,15,37,3],detailText:'Inflation on essentials drives consumer pessimism.',breakdownLabels:['18–29','30–44','45–64','65+'],breakdownValues:[30,28,22,20]},
+        {id:3,title:'Foreign Policy Satisfaction',summary:'Approval under 40%; consistency needed.',quotes:['“Allies unsure of stance.”','“Shifting policies confuse.”','“Need coherent strategy.”'],detailChart:[12,26,9,20,35,8],detailText:'Shifts in alliances erode confidence.',breakdownLabels:['Urban','Suburban','Rural'],breakdownValues:[35,30,25]},
+        {id:4,title:'Immigration Handling',summary:'Polarized between control and compassion.',quotes:['“Border security lax.”','“Humanitarian approach needed.”','“Mixed messaging.”'],detailChart:[22,22,6,18,32,6],detailText:'Views split sharply along party lines.',breakdownLabels:['No College','Some College','College','Postgraduate'],breakdownValues:[40,30,20,10]},
+        {id:5,title:'Tariffs & Trade',summary:'Businesses frustrated by unpredictability.',quotes:['“Tariffs hurt small biz.”','“Partners frustrated.”','“Need long-term plan.”'],detailChart:[10,24,8,18,30,10],detailText:'Inconsistent trade policy dampens investment.',breakdownLabels:['Manufacturing','Services','Tech','Agriculture'],breakdownValues:[25,30,25,20]},
+        {id:6,title:'Executive Tariff Authority',summary:'Opposition to expanded powers.',quotes:['“Congress should decide.”','“Too much presidential power.”','“Checks needed.”'],detailChart:[32,60,8],detailText:'Concerns over concentration of tariff decisions.',breakdownLabels:['Republicans','Independents','Democrats'],breakdownValues:[70,35,15]},
+        {id:7,title:'Healthcare Satisfaction',summary:'Under 40% highlight access issues.',quotes:['“Premiums sky-high.”','“Rural clinics empty.”','“Drug costs insane.”'],detailChart:[11,25,6,20,38,6],detailText:'Gaps in rural care and cost drive dissatisfaction.',breakdownLabels:['Urban','Suburban','Rural'],breakdownValues:[45,30,25]},
+        {id:8,title:'Tone & Communication Style',summary:'54% find tone combative.',quotes:['“Tone harsh.”','“Need respectful dialogue.”','“Confusing cues.”'],detailChart:[54,39,7],detailText:'Combative style alienates moderates.',breakdownLabels:['18–24','25–34','35–44','45+'],breakdownValues:[20,30,25,25]},
+        {id:9,title:'Approval by Affiliation',summary:'88% Rep vs 12% Dem vs 30% Ind.',quotes:['“Polarization grows.”','“Independents ignored.”','“Party divide.”'],detailChart:[88,30,12],detailText:'Strong correlation with party ID.',breakdownLabels:['Republicans','Independents','Democrats'],breakdownValues:[88,30,12]},
+        {id:10,title:'Approval by Age',summary:'Rises significantly with age.',quotes:['“Seniors supported.”','“Youth feel excluded.”','“Prefer younger leaders.”'],detailChart:[33,38,47,52],detailText:'Generational differences pronounced.',breakdownLabels:['18–29','30–44','45–64','65+'],breakdownValues:[33,38,47,52]},
+        {id:11,title:'Approval by Education',summary:'Higher education linked to lower approval.',quotes:['“Experts see flaws.”','“Need data-driven policy.”','“Academic voice ignored.”'],detailChart:[48,35,29],detailText:'Demand for evidence-based decisions.',breakdownLabels:['High School','Bachelor','Master','Doctorate'],breakdownValues:[50,30,15,5]},
+        {id:12,title:'Approval by Race',summary:'51% White vs lower minority rates.',quotes:['“Policies ignore us.”','“Need inclusion.”','“Representation matters.”'],detailChart:[51,13,28,31],detailText:'Equity concerns in minority groups.',breakdownLabels:['White','Black','Hispanic','Asian'],breakdownValues:[51,13,28,31]},
+        {id:13,title:'Global Conflicts Response',summary:'Mixed views on interventions.',quotes:['“Too passive.”','“Focus at home.”','“Need strategy.”'],detailChart:[15,18,10,25,32],detailText:'Tension between intervention vs isolation.',breakdownLabels:['Republicans','Independents','Democrats'],breakdownValues:[70,45,25]},
+        {id:14,title:'Musk & Dogecoin Endorsements',summary:'Experimental, divided reactions.',quotes:['“Bizarre choice.”','“Tech-forward.”','“Unprofessional.”'],detailChart:[10,15,33,20,22],detailText:'Innovation vs professionalism debate.',breakdownLabels:['Tech Enthusiasts','Investors','General Public'],breakdownValues:[35,25,40]}
+      ];
+      qualitative.forEach((q,i) => {
+        const card = document.createElement('div'); card.className = 'card';
+        card.innerHTML = `
+          <h2>Q${q.id}: ${q.title}</h2>
+          <div class="chart-container"><canvas id="qc${q.id}"></canvas></div>
+          <div class="chart-data">${['Positive','Neutral','Negative'].map((l,j)=>`${l}: ${q.detailChart[j]}%`).join(' | ')}</div>
+          <p class="summary"><strong>Key Insight:</strong> ${q.summary}</p>
+          <div class="quotes">${q.quotes.map(t=>`<div class="quote">${t}</div>`).join('')}</div>
+          <button class="expand-button" onclick="toggleExpand(this)">View More</button>
+          <div class="expanded-content">
+            <h3>Deeper Insight</h3><p>${q.detailText}</p>
+            <h3>Focus Group Breakdown</h3>
+            <div class="chart-container"><canvas id="qd${q.id}"></canvas></div>
+            <div class="chart-data" id="breakData${q.id}"></div>
+          </div>`;
+        document.getElementById('insightsGrid').appendChild(card);
+        new Chart(document.getElementById(`qc${q.id}`),{type:types[i%types.length],data:{labels:['Positive','Neutral','Negative'],datasets:[{data:q.detailChart,backgroundColor:colors}]},options:{plugins:{datalabels:{formatter:v=>v+'%',color:'#fff'}},maintainAspectRatio:false}});
+        new Chart(document.getElementById(`qd${q.id}`),{type:types[(i+1)%types.length],data:{labels:q.breakdownLabels,datasets:[{data:q.breakdownValues,backgroundColor:colors}]},options:{plugins:{datalabels:{formatter:v=>v+'%',color:'#000'}},maintainAspectRatio:false}});
+        document.getElementById(`breakData${q.id}`).innerHTML = q.breakdownLabels.map((l,j)=>`${l}: ${q.breakdownValues[j]}%`).join(' | ');
+      });
+      // Quantitative
+      const quantitative = [
+        {id:1,title:'Overall Job Approval',labels:['Approve','Disapprove','No Opinion'],vals:[42,53,5]},
+        {id:2,title:'Economic Confidence',labels:['Very','Somewhat','Not Very','Not at All','No Opinion'],vals:[20,25,15,37,3]},
+        {id:3,title:'Foreign Policy Satisfaction',labels:['Very','Somewhat','Neutral','Somewhat Dissatisfied','Very Dissatisfied','No Opinion'],vals:[12,26,9,20,35,8]},
+        {id:4,title:'Immigration Handling',labels:['Very','Somewhat','Neutral','Not Very','Not At All','No Opinion'],vals:[22,22,6,18,32,6]},
+        {id:5,title:'Tariffs & Trade',labels:['Very','Somewhat','Neutral','Somewhat Dissatisfied','Very Dissatisfied','No Opinion'],vals:[10,24,8,18,30,10]},
+        {id:6,title:'Exec Tariff Authority',labels:['Yes','No','No Opinion'],vals:[32,60,8]},
+        {id:7,title:'Healthcare Satisfaction',labels:['Very','Somewhat','Neutral','Somewhat Dissatisfied','Very Dissatisfied','No Opinion'],vals:[11,25,6,20,38,6]},
+        {id:8,title:'Tone & Communication',labels:['Too Aggressive','Appropriate','Too Passive'],vals:[54,39,7]},
+        {id:9,title:'Approval by Affiliation',labels:['Republicans','Independents','Democrats'],vals:[88,30,12]},
+        {id:10,title:'Approval by Age',labels:['18–29','30–44','45–64','65+'],vals:[33,38,47,52]},
+        {id:11,title:'Approval by Education',labels:['No College','College','Postgraduate'],vals:[48,35,29]},
+        {id:12,title:'Approval by Race',labels:['White','Black','Hispanic','Asian'],vals:[51,13,28,31]},
+        {id:13,title:'Global Conflicts Response',labels:['Very','Somewhat','Neutral','Not Very','Not at All'],vals:[15,18,10,25,32]},
+        {id:14,title:'Musk & Dogecoin Endorsements',labels:['Strongly Approve','Somewhat Approve','Neutral','Somewhat Disapprove','Strongly Disapprove'],vals:[10,15,33,20,22]}
+      ];
+      quantitative.forEach((q,i) => {
+        const card = document.createElement('div'); card.className = 'card';
+        card.innerHTML = `
+          <h2>Q${q.id}: ${q.title}</h2>
+          <div class="chart-container"><canvas id="qq${q.id}"></canvas></div>
+          <div class="chart-data">${q.labels.map((l,j)=>`${l}: ${q.vals[j]}%`).join(' | ')}</div>`;
+        document.getElementById('quantGrid').appendChild(card);
+        new Chart(document.getElementById(`qq${q.id}`),{type:types[i%types.length],data:{labels:q.labels,datasets:[{data:q.vals,backgroundColor:colors}]},options:{plugins:{datalabels:{formatter:v=>v+'%',color:'#000'}},scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}},maintainAspectRatio:false}});
+      });
+    });
+  </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 
-from agents.crew import QuestionAnsweringCrew
+from agents.qna.crew import QuestionAnsweringCrew
 
 
 def run():

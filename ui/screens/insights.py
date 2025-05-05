@@ -6,7 +6,7 @@ from pathlib import Path
 
 import streamlit as st
 
-from agents.crew import QuestionAnsweringCrew
+from agents.qna.crew import QuestionAnsweringCrew
 from ui.pdf import create_pdf
 from utils.pdf_reader import get_text
 
@@ -19,9 +19,12 @@ def show_insights_screen():
         .block-container {
             padding-top: 0 !important;
             padding-bottom: 0 !important;
-            padding-left: 1rem;
-            padding-right: 1rem;
+            padding-left: 5% !important; /* Add 5% left margin */
+            padding-right: 5% !important; /* Add 5% right margin */
             margin-top: 0 !important;
+            max-width: 90% !important; /* Set max width to 90% */
+            width: 90% !important; /* Set width to 90% */
+            height: 100vh !important; /* Make container fill viewport height */
         }
         #MainMenu {visibility: hidden;}
         header {visibility: hidden;}
@@ -58,6 +61,7 @@ def show_insights_screen():
             align-items: center;
             padding: 0 !important;
             margin: 0 !important;
+            margin-bottom: 0 !important; /* Remove space between header and panels */
         }
 
         /* Button container styling */
@@ -82,33 +86,41 @@ def show_insights_screen():
             margin: 0 !important;
         }
 
-        /* Fix streamlit columns alignment */
-        .row-widget.stHorizontal {
-            align-items: flex-start !important;
+        /* CRITICAL - Make panels take up full space */
+        [data-testid="stVerticalBlock"] {
+            height: calc(100vh - 100px) !important;
         }
 
-        /* Make all columns align at the top */
+        [data-testid="stHorizontal"] {
+            height: calc(100vh - 150px) !important;
+        }
+
+        /* Make columns fill vertical space */
         [data-testid="column"] {
-            align-self: flex-start !important;
-            margin-top: 0 !important;
-            padding-top: 0 !important;
+            height: calc(100vh - 150px) !important;
         }
 
-        /* Adjust tab positioning and spacing */
-        .stTabs [data-baseweb="tab-list"] {
-            margin-top: -25px !important;
-            padding-top: 0 !important;
-            margin-bottom: -5px !important;
+        /* New specialized classes for iframe containers */
+        .report-iframe-container {
+            height: calc(100vh - 131px) !important; /* Reduced height to make room for text input */
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            display: block;
+            margin-bottom: 10px !important;
         }
 
-        .stTabs [data-baseweb="tab-panel"] {
-            margin-top: 5px !important;
-            padding-top: 0 !important;
-        }
-
-        /* Additional spacing for iframe container in tabs */
-        .stTabs [data-baseweb="tab-panel"] .iframe-container {
-            margin-top: 5px !important;
+        .chat-iframe-container {
+            height: calc(100vh - 220px) !important; /* Reduced height to make room for text input */
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            display: block;
+            margin-bottom: 10px !important;
         }
 
         /* Basic message styling */
@@ -132,25 +144,9 @@ def show_insights_screen():
             clear: both;
         }
 
-        /* Consistent iframe container styling */
-        .iframe-container {
-            height: 60vh;
-            margin: 0 !important;
-            padding: 0 !important;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            overflow: hidden;
-            display: block;
-            margin-bottom: 10px !important; /* Reduced space below iframe container */
-        }
-
-        /* Special styling for iframe in right column (tabs) */
-        [data-testid="stVerticalBlock"] > div > [data-testid="stHorizontal"] > div:nth-child(2) .iframe-container {
-            margin-top: 5px !important;
-        }
-
         /* Consistent iframe styling */
-        .iframe-container iframe {
+        .report-iframe-container iframe,
+        .chat-iframe-container iframe {
             width: 100%;
             height: 100%;
             border: none;
@@ -166,93 +162,33 @@ def show_insights_screen():
             clear: both;
         }
 
-        /* Just make sure navigation buttons have proper margins */
-        .stTabs [data-baseweb="tab-panel"] .stButton > button {
-            margin-top: 5px !important;
-        }
-
         /* Position indicator styling */
         .stTabs [data-baseweb="tab-panel"] .stMarkdown p {
             margin-top: 5px !important;
         }
 
-        /* Remove space between title and tabs */
-        .stTabs {
-            margin-top: -25px !important;
-        }
-
         /* Fix spacing for text input label */
         [data-testid="stTextInput"] label {
-            margin-top: -22px !important;
+            margin-top: 0 !important;
             padding: 0 !important;
-            overflow: hidden !important;
-            position: absolute !important;
+            position: relative !important;
         }
 
-        /* Reduce space after iframe */
-        .iframe-container {
-            margin-bottom: 5px !important;
-        }
-
-        /* Adjust text input spacing */
+        /* Fix the text input styling */
         [data-testid="stTextInput"] {
-            margin-top: -5px !important;
+            margin-top: 10px !important;
             padding-top: 0 !important;
+            position: relative !important;
+            color: rgb(0, 0, 0);
         }
 
-        /* Custom container margin */
-        .custom-container {
-            margin-bottom: 30px;
+        /* Make text input visible and properly positioned */
+        [data-testid="stTextInput"] > div > div > input {
+            background-color: white !important;
+            border: 1px solid #ddd !important;
+            border-radius: 5px !important;
+            color: black !important;  /* Changed from white to black */
         }
-
-        /* Add margin-bottom to the first stElement under header container */
-        [data-testid="stVerticalBlock"] > div:first-child {
-            margin-bottom: 1.5rem !important;
-        }
-
-        /* Target this specific container */
-        [data-testid="stVerticalBlock"] > div:first-child > div:first-child {
-            margin-top: 0 !important;
-            padding-top: 0 !important;
-        }
-
-        /* Reduce spacing between all streamlit elements */
-        div.stElement > div {
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            margin-top: 0 !important;
-            margin-bottom: 0 !important;
-        }
-
-        /* Force column containers to align at the top with minimal spacing */
-        .row-widget.stHorizontal > div {
-            align-items: flex-start !important;
-            margin-top: 0 !important;
-            padding-top: 0 !important;
-        }
-
-        /* File position counter styles to match text input label */
-        .file-position-label {
-            font-size: 14px !important;
-            margin-bottom: 0 !important;
-            font-weight: 400 !important;
-            line-height: 1.6 !important;
-            padding: 0 !important;
-            margin-top: -5px !important;
-            height: auto !important;
-            display: block !important;
-        }
-
-        /* Fix vertical alignment across columns */
-        [data-testid="stHorizontal"] > div {
-            vertical-align: top !important;
-        }
-
-        /* Remove margin from text input */
-        [data-testid="stTextInput"] {
-            margin-top: 0 !important;
-        }
-
     </style>
     """, unsafe_allow_html=True)
 
@@ -277,6 +213,7 @@ def show_insights_screen():
         report_path = os.path.join(data_path, "100 Days into Trump's 2nd Term.pdf")
         if os.path.exists(report_path):
             st.session_state.report_text = get_text(report_path)
+            print(st.session_state.report_text)
             st.session_state.qna_agent = QuestionAnsweringCrew().crew()
 
     # Sample HTML files for demonstration (replace with actual file paths)
@@ -300,6 +237,10 @@ def show_insights_screen():
                 os.path.join(data_path, "qualitative/07.html"),
             ]
         }
+
+    def reset():
+        for key in st.session_state.keys():
+            del st.session_state[key]
 
     def send_message():
         if st.session_state.user_input.strip():
@@ -339,23 +280,7 @@ def show_insights_screen():
             # Update session ID to force refresh of HTML component
             st.session_state.session_id = int(time.time() * 1000)
 
-    def navigate_html(direction, tab_name=None):
-        # If tab_name is provided, use it; otherwise use active_tab from session state
-        tab_to_use = tab_name if tab_name else st.session_state.active_tab
-
-        current_index = st.session_state.current_html_index[tab_to_use]
-        max_index = len(st.session_state.html_files[tab_to_use]) - 1
-
-        if direction == "prev" and current_index > 0:
-            st.session_state.current_html_index[tab_to_use] -= 1
-            # Reset HTML assistant since we've changed files
-            st.session_state.qna_agent = None
-        elif direction == "next" and current_index < max_index:
-            st.session_state.current_html_index[tab_to_use] += 1
-            # Reset HTML assistant since we've changed files
-            st.session_state.qna_agent = None
-
-    # NEW STRUCTURE: First create header container at the top level (outside any columns)
+    # Create a custom container for the header with minimal margin-bottom
     header_container = st.container()
     with header_container:
         # Create columns for title and buttons
@@ -383,18 +308,85 @@ def show_insights_screen():
             # New Survey button
             with btn_cols[1]:
                 if st.button("New Survey", key="insights_back", use_container_width=True):
-                    # Note: HTML Assistant remains initialized
+                    reset()
                     st.session_state.current_screen = 'survey'
                     st.rerun()
 
-    # Then create the main container with left and right columns
+    # Create the main container
     main_container = st.container()
     with main_container:
-        # Create two columns for the panels with zero spacing
-        left_col, right_col = st.columns(2)
+        # Create two columns for the panels with 70/30 split
+        left_col, right_col = st.columns([7, 3])
 
-        # Left Panel - Chat
+        # Left Panel - HTML Display
         with left_col:
+            # Display a single HTML file (report.html)
+            report_file = os.path.join(data_path, "report.html")
+
+            try:
+                if os.path.exists(report_file):
+                    with open(report_file, 'r', encoding='utf-8') as f:
+                        html_content = f.read()
+                else:
+                    html_content = f"<html><body><h2>File not found</h2><p>Could not locate: {report_file}</p></body></html>"
+            except Exception as e:
+                html_content = f"<html><body><h2>Error loading file</h2><p>{str(e)}</p></body></html>"
+
+            simple_html = f"""
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+                <style>
+                    html, body {{
+                        height: 100%;
+                        margin: 0;
+                        padding: 0;
+                        overflow: hidden;
+                    }}
+                    .scrollable-container {{
+                        height: 100%;
+                        width: 100%;
+                        overflow-y: auto;
+                        overflow-x: auto;
+                        box-sizing: border-box;
+                    }}
+                    .content-wrapper {{
+                        padding: 20px;
+                        min-height: 100%;
+                        box-sizing: border-box;
+                        /* Center the content horizontally */
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                    }}
+                    /* In case the content itself needs specific centering */
+                    .content-wrapper > * {{
+                        max-width: 100%;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="scrollable-container">
+                    <div class="content-wrapper">
+                        {html_content}
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+
+            # Encode the HTML content
+            encoded_html = base64.b64encode(simple_html.encode()).decode()
+
+            # Use the report iframe container
+            st.markdown(
+                f'<div class="report-iframe-container"><iframe src="data:text/html;base64,{encoded_html}"></iframe></div>',
+                unsafe_allow_html=True
+            )
+
+        # Right Panel - Chat
+        with right_col:
             # Chat messages container
             chat_container = st.container()
 
@@ -502,203 +494,12 @@ def show_insights_screen():
                 # Create a data URL for the chat content
                 chat_data_url = f"data:text/html;base64,{base64.b64encode(chat_html.encode()).decode()}"
 
-                # Display using the consistent iframe container
+                # Display using the chat iframe container
                 st.markdown(
-                    f'<div class="iframe-container"><iframe src="{chat_data_url}"></iframe></div>',
+                    f'<div class="chat-iframe-container"><iframe src="{chat_data_url}"></iframe></div>',
                     unsafe_allow_html=True
                 )
 
-            # Chat input area
-            st.text_input("Ask questions about the results:", key="user_input", on_change=send_message,
-                          placeholder="Type your question here...")
-
-        # Right Panel - HTML Display
-        with right_col:
-            # Create tabs using Streamlit's native tab component
-            tab1, tab2 = st.tabs(["Quantitative results", "Qualitative results"])
-
-            # Define a callback that will be executed after tab selection
-            if "previous_tab" not in st.session_state:
-                st.session_state.previous_tab = None
-
-            # Update session state based on tab selection
-            with tab1:
-                # Content for Quantitative results tab
-                if st.session_state.previous_tab != 0:
-                    st.session_state.active_tab = "Quantitative results"
-                    st.session_state.previous_tab = 0
-
-                # Get current HTML file for this tab
-                active_tab = "Quantitative results"
-                current_index = st.session_state.current_html_index[active_tab]
-                html_files = st.session_state.html_files[active_tab]
-
-                # Display HTML content for this tab
-                if html_files:
-                    try:
-                        current_file = html_files[current_index]
-                        try:
-                            if os.path.exists(current_file):
-                                with open(current_file, 'r') as f:
-                                    html_content = f.read()
-                            else:
-                                html_content = f"<html><body><h2>File not found</h2><p>Could not locate: {current_file}</p></body></html>"
-                        except Exception as e:
-                            html_content = f"<html><body><h2>Error loading file</h2><p>{str(e)}</p></body></html>"
-
-                        # Use a very simple approach - just add padding to the HTML
-                        simple_html = f"""
-                        <html>
-                        <head>
-                            <style>
-                                body {{
-                                    padding-top: 20px;  /* Reduced padding */
-                                    padding-bottom: 20px;  /* Reduced padding */
-                                    padding-left: 20px;
-                                    padding-right: 20px;
-                                }}
-                            </style>
-                        </head>
-                        <body>
-                            {html_content}
-                        </body>
-                        </html>
-                        """
-
-                        # Encode the HTML content
-                        encoded_html = base64.b64encode(simple_html.encode()).decode()
-
-                        # Use the consistent iframe container
-                        st.markdown(
-                            f'<div class="iframe-container"><iframe src="data:text/html;base64,{encoded_html}"></iframe></div>',
-                            unsafe_allow_html=True
-                        )
-                    except Exception as e:
-                        st.error(f"Error displaying HTML: {str(e)}")
-
-                # Show current position with proper label alignment
-                if html_files:
-                    current_index = st.session_state.current_html_index[active_tab]
-                    total_files = len(html_files)
-                    st.markdown(f'<div class="file-position-label">File {current_index + 1} of {total_files}:</div>',
-                                unsafe_allow_html=True)
-
-                # Navigation buttons for this tab
-                nav_col1, nav_col2 = st.columns(2)
-                with nav_col1:
-                    prev_disabled = st.session_state.current_html_index[active_tab] == 0
-                    if st.button("← Previous", key="prev_btn_quant", on_click=navigate_html,
-                                 args=("prev", "Quantitative results"),
-                                 disabled=prev_disabled, use_container_width=True):
-                        pass
-
-                with nav_col2:
-                    next_disabled = len(html_files) == 0 or st.session_state.current_html_index[active_tab] >= len(
-                        html_files) - 1
-                    if st.button("Next →", key="next_btn_quant", on_click=navigate_html,
-                                 args=("next", "Quantitative results"),
-                                 disabled=next_disabled, use_container_width=True):
-                        pass
-
-            with tab2:
-                # Content for Qualitative results tab
-                if st.session_state.previous_tab != 1:
-                    st.session_state.active_tab = "Qualitative results"
-                    st.session_state.previous_tab = 1
-
-                # Get current HTML file for this tab
-                active_tab = "Qualitative results"
-                current_index = st.session_state.current_html_index[active_tab]
-                html_files = st.session_state.html_files[active_tab]
-
-                # Display HTML content for this tab
-                if html_files:
-                    try:
-                        current_file = html_files[current_index]
-                        try:
-                            if os.path.exists(current_file):
-                                with open(current_file, 'r', encoding='utf-8') as f:
-                                    html_content = f.read()
-                            else:
-                                html_content = f"<html><body><h2>File not found</h2><p>Could not locate: {current_file}</p></body></html>"
-                        except Exception as e:
-                            html_content = f"<html><body><h2>Error loading file</h2><p>{str(e)}</p></body></html>"
-
-                        simple_html = f"""
-                        <html>
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-                            <style>
-                                html, body {{
-                                    height: 100%;
-                                    margin: 0;
-                                    padding: 0;
-                                    overflow: hidden;
-                                }}
-                                .scrollable-container {{
-                                    height: 100%;
-                                    width: 100%;
-                                    overflow-y: auto;
-                                    overflow-x: auto;
-                                    box-sizing: border-box;
-                                }}
-                                .content-wrapper {{
-                                    padding: 20px;
-                                    min-height: 100%;
-                                    box-sizing: border-box;
-                                    /* Center the content horizontally */
-                                    display: flex;
-                                    flex-direction: column;
-                                    align-items: center;
-                                }}
-                                /* In case the card itself needs specific centering */
-                                .content-wrapper > * {{
-                                    max-width: 100%;
-                                }}
-                            </style>
-                        </head>
-                        <body>
-                            <div class="scrollable-container">
-                                <div class="content-wrapper">
-                                    {html_content}
-                                </div>
-                            </div>
-                        </body>
-                        </html>
-                        """
-
-                        # Encode the HTML content
-                        encoded_html = base64.b64encode(simple_html.encode()).decode()
-
-                        # Use the consistent iframe container
-                        st.markdown(
-                            f'<div class="iframe-container"><iframe src="data:text/html;base64,{encoded_html}"></iframe></div>',
-                            unsafe_allow_html=True
-                        )
-                    except Exception as e:
-                        st.error(f"Error displaying HTML: {str(e)}")
-
-                # Show current position with proper label alignment
-                if html_files:
-                    current_index = st.session_state.current_html_index[active_tab]
-                    total_files = len(html_files)
-                    st.markdown(f'<div class="file-position-label">File {current_index + 1} of {total_files}:</div>',
-                                unsafe_allow_html=True)
-
-                # Navigation buttons for this tab
-                nav_col1, nav_col2 = st.columns(2)
-                with nav_col1:
-                    prev_disabled = st.session_state.current_html_index[active_tab] == 0
-                    if st.button("← Previous", key="prev_btn_qual", on_click=navigate_html,
-                                 args=("prev", "Qualitative results"),
-                                 disabled=prev_disabled, use_container_width=True):
-                        pass
-
-                with nav_col2:
-                    next_disabled = len(html_files) == 0 or st.session_state.current_html_index[active_tab] >= len(
-                        html_files) - 1
-                    if st.button("Next →", key="next_btn_qual", on_click=navigate_html,
-                                 args=("next", "Qualitative results"),
-                                 disabled=next_disabled, use_container_width=True):
-                        pass
+                # Chat input area - MOVED INSIDE the chat_container to position it below the iframe
+                st.text_input("Ask questions about the results:", key="user_input", on_change=send_message,
+                              placeholder="Type your question here...")
