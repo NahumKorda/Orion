@@ -1,4 +1,7 @@
 # Predefined questions list for the Questions screen
+import os
+from pathlib import Path
+
 PREDEFINED_QUESTIONS = [
     "What primarily motivates each group's choice?",
     "What else influences each group's choice?",
@@ -11,3 +14,10 @@ PREDEFINED_QUESTIONS = [
     "What policy areas generate the most engagement?",
     "How has sentiment shifted over the past election cycle?"
 ]
+
+
+def get_data_path():
+    current_path = Path(__file__).resolve()
+    package_root = current_path.parent.resolve()
+    project_root = package_root.parent.resolve()
+    return os.path.join(project_root, "data")
