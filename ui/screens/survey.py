@@ -1,7 +1,12 @@
 import streamlit as st
 
+from ui.screens.html import reduced_title_padding
+
 
 def show_survey_screen():
+
+    st.markdown(reduced_title_padding(), unsafe_allow_html=True)
+
     # Create a centered container with 50% width
     container = st.container()
     with container:
@@ -118,11 +123,13 @@ def show_survey_screen():
                 if st.checkbox("Show JSON Data"):
                     st.json(st.session_state.survey_data)
 
-            back_col, empty_col, next_col = st.columns([3, 10, 2.2])
+            st.markdown("---")
+
+            back_col, next_col = st.columns(2)
 
             # Create regular "Next" button in the right column
             with next_col:
-                if st.button("Next", key="survey_next"):
+                if st.button("Next", key="survey_next", use_container_width=True):
                     # Validate data here if needed
                     if 'validated' not in st.session_state:
                         st.session_state.validated = {}

@@ -1,8 +1,13 @@
 import streamlit as st
+
+from ui.screens.html import reduced_title_padding
 from ui.utils import PREDEFINED_QUESTIONS
 
 
 def show_questions_screen():
+
+    st.markdown(reduced_title_padding(), unsafe_allow_html=True)
+
     # Create a centered container with 50% width
     container = st.container()
     with container:
@@ -64,17 +69,21 @@ def show_questions_screen():
                         st.session_state.new_custom_question = ""
                         st.rerun()
 
-            back_col, empty_col, next_col = st.columns([3, 10, 2.2])
+            st.markdown("---")
+
+            back_col, next_col = st.columns(2)
 
             # Create regular "Back" button in the left column
             with back_col:
-                if st.button("Back", key="questions_back"):
+                if st.button("Back", key="questions_back", use_container_width=True):
                     st.session_state.current_screen = 'filters'
                     st.rerun()
 
             # Create regular "Next" button in the right column
             with next_col:
-                if st.button("Next", key="questions_next"):
+                if st.button("Next", key="questions_next", use_container_width=True):
                     st.session_state.validated['Questions'] = True
                     st.session_state.current_screen = 'processing'
                     st.rerun()
+
+        st.markdown("<br><br>", unsafe_allow_html=True)

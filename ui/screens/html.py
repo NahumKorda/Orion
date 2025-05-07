@@ -1,3 +1,17 @@
+def reduced_title_padding():
+    return """
+        <style>
+        .block-container {
+            padding-top: 1rem;
+            padding-bottom: 0rem;
+        }
+        h1 {
+            margin-top: 0rem;
+        }
+        </style>
+    """
+
+
 def get_simple_html(html_content: str) -> str:
     return f"""
             <html>

@@ -1,6 +1,10 @@
 import streamlit as st
 import time
 
+from sympy.printing.pretty.pretty_symbology import center
+
+from ui.screens.html import reduced_title_padding
+
 
 def show_processing_screen():
     # Create a centered container with 50% width
@@ -24,9 +28,24 @@ def show_processing_screen():
             # Display checklist of previous steps
             st.subheader("Steps Completed")
 
+            # For each completed step, add a "Back to X" button
             for step, validated in st.session_state.validated.items():
-                check_icon = "✅" if validated else "❌"
-                st.markdown(f"{check_icon} {step}")
+                # Create two columns for each step - one for the status, one for the button
+                step_col, button_col = st.columns([3, 2], vertical_alignment='center')
+
+                with step_col:
+                    check_icon = "✅" if validated else "❌"
+                    st.markdown(f"{check_icon} {step}")
+
+                # Only show back button if step is validated/completed
+                with button_col:
+                    if validated:
+                        # Convert step name to lowercase and replace spaces with underscores for page name
+                        page_name = step.lower().replace(" ", "_")
+                        if st.button(f"Back to {step}", key=f"back_to_{page_name}"):
+                            # Set current screen to the selected step's page
+                            st.session_state.current_screen = page_name
+                            st.rerun()
 
             st.markdown("---")
 
@@ -105,11 +124,3 @@ def show_processing_screen():
                             }
                             st.session_state.current_screen = 'insights'
                             st.rerun()
-
-            back_col, empty_col, next_col = st.columns([3, 10, 2.2])
-
-            # Create regular "Back" button in the left column
-            with back_col:
-                if st.button("Back", key="processing_back"):
-                    st.session_state.current_screen = 'questions'
-                    st.rerun()

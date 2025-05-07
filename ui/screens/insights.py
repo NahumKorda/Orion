@@ -28,12 +28,7 @@ def show_insights_screen():
         report_path = os.path.join(get_data_path(), "100 Days into Trump's 2nd Term.pdf")
         if os.path.exists(report_path):
             st.session_state.report_text = get_text(report_path)
-            print(st.session_state.report_text)
             st.session_state.qna_agent = QuestionAnsweringCrew().crew()
-    else:
-        print("SESSION STATE")
-        for key in st.session_state.keys():
-            print(key)
 
     def reset():
         for key in st.session_state.keys():
@@ -58,7 +53,6 @@ def show_insights_screen():
                         'question': user_question
                     }
                     response = st.session_state.qna_agent.kickoff(inputs)
-                    print(response.raw)
                     response = markdown.markdown(response.raw, extensions=['tables', 'fenced_code'])
                 except Exception as e:
                     response = f"Sorry, I encountered an error: {str(e)}. Please try again."
