@@ -1,214 +1,263 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sentimate Insights Dashboard</title>
-  <!-- Chart.js and DataLabels plugin -->
+  <title>Sentimate</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sentimate Dashboard</title>
+  <!-- Load fonts & Chart.js -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f9; margin: 0; padding: 0; }
-    header { background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
-    nav.container { display: flex; align-items: center; padding: 10px 20px; }
-    nav .logo { height: 40px; margin-right: auto; }
-    nav a { margin-left: 20px; color: #0b3954; text-decoration: none; font-weight: bold; }
-    .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; transition: margin-right 0.3s ease; }
-    .dashboard.chat-open .container { margin-right: 350px; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 20px; display: flex; flex-direction: column; }
-    .card h2 { font-size: 1.1em; margin: 0 0 8px; color: #087e8b; }
-    .summary { font-size: 0.9em; color: #444; margin: 10px 0; }
-    .chart-container { width: 100%; height: 160px; margin-bottom: 8px; }
-    .chart-data { font-size: 0.8em; color: #333; margin-bottom: 8px; }
-    canvas { max-width: 100%; max-height: 160px; }
-    .quotes { margin: 8px 0; }
-    .quote { background: #e1f5fe; padding: 6px; border-left: 4px solid #007BFF; margin-bottom: 4px; border-radius: 6px; font-style: italic; font-size: 0.75em; }
-    .expand-button { background: none; border: none; color: #007BFF; cursor: pointer; font-size: 0.85em; padding: 0; margin-top: 6px; align-self: flex-start; }
-    .expanded-content { display: none; margin-top: 10px; font-size: 0.85em; color: #333; }
-    .expanded-content h3 { margin-top: 12px; color: #005b96; font-size: 0.9em; }
-    .expanded-content p { margin-bottom: 8px; }
-    .section { margin-top: 40px; }
-    .section h2 { color: #0b3954; margin-bottom: 20px; }
-    .section ul { font-size: 0.9em; color: #444; list-style: disc; margin-left: 20px; }
-    .dashboard { display: flex; }
-    .chat-panel { width: 350px; background: #fff; border-left: 1px solid #ddd; position: fixed; right: 0; top: 0; bottom: 0; transform: translateX(100%); transition: transform 0.3s ease; display: flex; flex-direction: column; z-index: 200; }
-    .chat-panel.open { transform: translateX(0); }
-    .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f8f9fa; }
-    .chat-header button { background: none; border: none; font-size: 1.2em; cursor: pointer; }
-    .chat-body { flex: 1; padding: 12px; overflow-y: auto; }
-    .chat-input { display: flex; border-top: 1px solid #ddd; padding: 8px; }
-    .chat-input input { flex: 1; padding: 8px; border-radius: 20px; border: 1px solid #ccc; }
-    .chat-input button { margin-left: 8px; background: #007BFF; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; }
-    .chat-toggle { position: fixed; right: 20px; bottom: 20px; background: #007BFF; color: #fff; padding: 12px 28px; cursor: pointer; border-radius: 28px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); font-size: 1em; z-index: 201; }
+    body { font-family:'Inter',sans-serif; background:#F5F5F5; margin:0; padding-top:80px; color:#333; line-height:1.4; }
+    header { position:fixed; top:0; width:100%; height:60px; background:#fff; border-bottom:1px solid #DDD; display:flex; align-items:center; padding:0 20px; z-index:100; }
+    .logo { font-weight:700; font-size:20px; color:#2C3E50; }
+    nav { flex:1; text-align:center; }
+    nav a { margin:0 16px; color:#2C3E50; text-decoration:none; font-weight:600; }
+    section { max-width:1200px; margin:0 auto; padding:80px 20px 40px; }
+    h1 { font-size:22px; margin-bottom:16px; color:#2C3E50; }
+    .exec-summary { background:#fff; border-radius:8px; padding:20px; box-shadow:0 2px 6px rgba(0,0,0,0.05); margin-bottom:40px; }
+    .exec-summary ul { padding-left:20px; }
+    .exec-summary li { margin-bottom:8px; }
+    .dashboard-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:24px; }
+    .card { display:flex; flex-direction:column; background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
+    .card h3 { font-size:18px; margin:0 0 12px; color:#2C3E50; }
+    .card p { margin:0 0 12px; }
+    .quote { font-style:italic; background:#E8EEF2; border-left:4px solid #4A6470; padding:8px; margin:8px 0; border-radius:4px; }
+    .view-btn { align-self:flex-start; margin-top:auto; padding:6px 12px; border:2px solid #4A6470; color:#4A6470; background:none; cursor:pointer; border-radius:4px; transition:background .2s,color .2s; }
+    .view-btn.expanded { background:#4A6470; color:#fff; }
+    .view-content { max-height:0; overflow:hidden; transition:max-height .3s ease; margin-top:12px; }
+    .view-content.open { max-height:500px; }
+    .view-content h4 { margin:16px 0 8px; font-size:16px; color:#2C3E50; }
+    table { width:100%; border-collapse:collapse; margin-top:12px; font-size:14px; }
+    th,td { text-align:left; padding:8px; border-bottom:1px solid #EEE; }
+    th { background:#F0F0F0; color:#2C3E50; }
+    canvas { max-width:100%; max-height:220px; margin-bottom:12px; }
   </style>
 </head>
 <body>
   <header>
-    <nav class="container">
-      <img src="logo.png" alt="Sentimate Logo" class="logo">
-      <a href="#executive">Executive</a>
-      <a href="#insights">Qualitative</a>
-      <a href="#quantitative">Quantitative</a>
-      <a href="#analysis">Summary</a>
-      <a href="#recommendations">Recommendations</a>
+    <div class="logo">Sentimate</div>
+    <nav>
+      <a href="#exec">Executive Summary</a>
+      <a href="#qual">Qualitative</a>
+      <a href="#quant">Quantitative</a>
     </nav>
   </header>
-  <div class="dashboard" id="dashboard">
-    <div class="container">
-      <!-- Executive -->
-      <section id="executive" class="section">
-        <h2>Executive Overview</h2>
-        <p class="summary"><strong>Survey:</strong> 1,200 U.S. adults, April–May 2025</p>
-        <p class="summary">Approval fell from <strong>49%</strong> to <strong>42%</strong> in first 100 days:</p>
-        <ul>
-          <li>18–29 <strong>(–12 pts)</strong>: debt relief & climate concerns</li>
-          <li>Independents <strong>(–9 pts)</strong>: messaging inconsistency</li>
-          <li>Economic confidence <strong>45%</strong>: six-year low</li>
-          <li>Healthcare rural <strong>&lt;38%</strong>: access & cost</li>
-          <li>Foreign policy <strong>&lt;40%</strong>: diplomatic skepticism</li>
-        </ul>
-      </section>
-      <!-- Qualitative -->
-      <section id="insights" class="section">
-        <h2>Qualitative Insights</h2>
-        <div class="grid" id="insightsGrid"></div>
-      </section>
-      <!-- Quantitative -->
-      <section id="quantitative" class="section">
-        <h2>Quantitative Results</h2>
-        <div class="grid" id="quantGrid"></div>
-      </section>
-      <!-- Summary -->
-      <section id="analysis" class="section">
-        <h2>Detailed Summary</h2>
-        <ul>
-          <li><strong>Youth & Independents:</strong> trust erosion –12, –9 pts</li>
-          <li><strong>Economic:</strong> 55% feel worse, 45% confidence</li>
-          <li><strong>Healthcare:</strong> rural 42% vs urban 35%</li>
-          <li><strong>Foreign Policy:</strong> &lt;40% approval</li>
-        </ul>
-      </section>
-      <!-- Recommendations -->
-      <section id="recommendations" class="section">
-        <h2>Strategic Recommendations</h2>
-        <ul>
-          <li>Unified messaging: economy, healthcare, climate</li>
-          <li>Youth campaigns: debt relief & green jobs</li>
-          <li>Monthly bipartisan highlights</li>
-          <li>Regional tailored narratives</li>
-        </ul>
-      </section>
-    </div>
-    <!-- Chat -->
-    <div class="chat-panel" id="chatPanel">
-      <div class="chat-header">AI Agent <button onclick="toggleChat()">×</button></div>
-      <div class="chat-body" id="chatBody"></div>
-      <div class="chat-input">
-        <input type="text" id="chatInput" placeholder="Ask a question...">
-        <button id="sendBtn">Send</button>
-      </div>
-    </div>
-    <div class="chat-toggle" id="chatToggle">Ask a Question</div>
-  </div>
+
+  <section id="exec" class="exec-summary">
+    <h1>Executive Summary</h1>
+    <p>The first 100 days of Trump’s second term reveal 42% approval vs. 53% disapproval. Qualitative interviews show economic optimism driving supporters, while Independents and Democrats express emotional fatigue. Subgroup analysis by age, education, and affiliation offers strategic messaging guidance.</p>
+    <ul>
+      <li><strong>Economic Pride vs. Emotional Burnout:</strong> Robust job metrics bolster the base; high-drama tone fatigues others.</li>
+      <li><strong>Demographic Divides:</strong> Younger and college-educated voters trend negative; older and less-educated trend positive.</li>
+      <li><strong>Strategic Messaging:</strong> Tailor tone and policy emphasis to subgroup concerns.</li>
+    </ul>
+  </section>
+
+  <section id="qual">
+    <h1>Qualitative Insights</h1>
+    <div id="qual-grid" class="dashboard-grid"></div>
+  </section>
+
+  <section id="quant">
+    <h1>Quantitative Results</h1>
+    <div id="quant-grid" class="dashboard-grid"></div>
+  </section>
+
   <script>
-    function toggleChat() {
-      const panel = document.getElementById('chatPanel'),
-            dash = document.getElementById('dashboard'),
-            tog = document.getElementById('chatToggle');
-      panel.classList.toggle('open');
-      dash.classList.toggle('chat-open');
-      tog.style.display = panel.classList.contains('open') ? 'none' : 'block';
-    }
-    document.getElementById('chatToggle').addEventListener('click', toggleChat);
-    document.getElementById('sendBtn').addEventListener('click', () => {
-      const msg = document.getElementById('chatInput').value.trim();
-      if (!msg) return;
-      const body = document.getElementById('chatBody'),
-            pu = document.createElement('p');
-      pu.className = 'user';
-      pu.textContent = msg;
-      body.appendChild(pu);
-      document.getElementById('chatInput').value = '';
-      const pb = document.createElement('p');
-      pb.className = 'bot';
-      pb.textContent = 'AI Agent is typing...';
-      body.appendChild(pb);
-      setTimeout(() => { pb.textContent = 'Insightful response: ' + msg; }, 1000);
-    });
-    function toggleExpand(btn) {
-      const c = btn.nextElementSibling;
-      c.style.display = c.style.display === 'block' ? 'none' : 'block';
-      btn.textContent = c.style.display === 'block' ? 'Hide Details' : 'View More';
-    }
-    document.addEventListener('DOMContentLoaded', () => {
-      Chart.register(ChartDataLabels);
-      const colors = ['#00BCD4','#8BC34A','#FF9800','#FF6384','#36A2EB','#FFCE56'];
-      const types = ['doughnut','bar','pie','line'];
-      // Qualitative data
-      const qualitative = [
-        {id:1,title:'Overall Job Approval',summary:'Division deep, youth most critical of performance.',quotes:['“Flip-flops confuse voters.”','“Daily economic pinch felt.”','“Diplomatic stance inconsistent.”'],detailChart:[45,25,30],detailText:'Unpredictable policy announcements undermine trust, especially on trade and environment.',breakdownLabels:['Republicans','Independents','Democrats'],breakdownValues:[65,40,20]},
-        {id:2,title:'Economic Confidence',summary:'Lowest in six years amid cost pressures.',quotes:['“Prices outpace paychecks.”','“Healthcare bills stress me.”','“Saving seems impossible.”'],detailChart:[20,25,15,37,3],detailText:'Inflation on essentials drives consumer pessimism.',breakdownLabels:['18–29','30–44','45–64','65+'],breakdownValues:[30,28,22,20]},
-        {id:3,title:'Foreign Policy Satisfaction',summary:'Approval under 40%; consistency needed.',quotes:['“Allies unsure of stance.”','“Shifting policies confuse.”','“Need coherent strategy.”'],detailChart:[12,26,9,20,35,8],detailText:'Shifts in alliances erode confidence.',breakdownLabels:['Urban','Suburban','Rural'],breakdownValues:[35,30,25]},
-        {id:4,title:'Immigration Handling',summary:'Polarized between control and compassion.',quotes:['“Border security lax.”','“Humanitarian approach needed.”','“Mixed messaging.”'],detailChart:[22,22,6,18,32,6],detailText:'Views split sharply along party lines.',breakdownLabels:['No College','Some College','College','Postgraduate'],breakdownValues:[40,30,20,10]},
-        {id:5,title:'Tariffs & Trade',summary:'Businesses frustrated by unpredictability.',quotes:['“Tariffs hurt small biz.”','“Partners frustrated.”','“Need long-term plan.”'],detailChart:[10,24,8,18,30,10],detailText:'Inconsistent trade policy dampens investment.',breakdownLabels:['Manufacturing','Services','Tech','Agriculture'],breakdownValues:[25,30,25,20]},
-        {id:6,title:'Executive Tariff Authority',summary:'Opposition to expanded powers.',quotes:['“Congress should decide.”','“Too much presidential power.”','“Checks needed.”'],detailChart:[32,60,8],detailText:'Concerns over concentration of tariff decisions.',breakdownLabels:['Republicans','Independents','Democrats'],breakdownValues:[70,35,15]},
-        {id:7,title:'Healthcare Satisfaction',summary:'Under 40% highlight access issues.',quotes:['“Premiums sky-high.”','“Rural clinics empty.”','“Drug costs insane.”'],detailChart:[11,25,6,20,38,6],detailText:'Gaps in rural care and cost drive dissatisfaction.',breakdownLabels:['Urban','Suburban','Rural'],breakdownValues:[45,30,25]},
-        {id:8,title:'Tone & Communication Style',summary:'54% find tone combative.',quotes:['“Tone harsh.”','“Need respectful dialogue.”','“Confusing cues.”'],detailChart:[54,39,7],detailText:'Combative style alienates moderates.',breakdownLabels:['18–24','25–34','35–44','45+'],breakdownValues:[20,30,25,25]},
-        {id:9,title:'Approval by Affiliation',summary:'88% Rep vs 12% Dem vs 30% Ind.',quotes:['“Polarization grows.”','“Independents ignored.”','“Party divide.”'],detailChart:[88,30,12],detailText:'Strong correlation with party ID.',breakdownLabels:['Republicans','Independents','Democrats'],breakdownValues:[88,30,12]},
-        {id:10,title:'Approval by Age',summary:'Rises significantly with age.',quotes:['“Seniors supported.”','“Youth feel excluded.”','“Prefer younger leaders.”'],detailChart:[33,38,47,52],detailText:'Generational differences pronounced.',breakdownLabels:['18–29','30–44','45–64','65+'],breakdownValues:[33,38,47,52]},
-        {id:11,title:'Approval by Education',summary:'Higher education linked to lower approval.',quotes:['“Experts see flaws.”','“Need data-driven policy.”','“Academic voice ignored.”'],detailChart:[48,35,29],detailText:'Demand for evidence-based decisions.',breakdownLabels:['High School','Bachelor','Master','Doctorate'],breakdownValues:[50,30,15,5]},
-        {id:12,title:'Approval by Race',summary:'51% White vs lower minority rates.',quotes:['“Policies ignore us.”','“Need inclusion.”','“Representation matters.”'],detailChart:[51,13,28,31],detailText:'Equity concerns in minority groups.',breakdownLabels:['White','Black','Hispanic','Asian'],breakdownValues:[51,13,28,31]},
-        {id:13,title:'Global Conflicts Response',summary:'Mixed views on interventions.',quotes:['“Too passive.”','“Focus at home.”','“Need strategy.”'],detailChart:[15,18,10,25,32],detailText:'Tension between intervention vs isolation.',breakdownLabels:['Republicans','Independents','Democrats'],breakdownValues:[70,45,25]},
-        {id:14,title:'Musk & Dogecoin Endorsements',summary:'Experimental, divided reactions.',quotes:['“Bizarre choice.”','“Tech-forward.”','“Unprofessional.”'],detailChart:[10,15,33,20,22],detailText:'Innovation vs professionalism debate.',breakdownLabels:['Tech Enthusiasts','Investors','General Public'],breakdownValues:[35,25,40]}
-      ];
-      qualitative.forEach((q,i) => {
-        const card = document.createElement('div'); card.className = 'card';
-        card.innerHTML = `
-          <h2>Q${q.id}: ${q.title}</h2>
-          <div class="chart-container"><canvas id="qc${q.id}"></canvas></div>
-          <div class="chart-data">${['Positive','Neutral','Negative'].map((l,j)=>`${l}: ${q.detailChart[j]}%`).join(' | ')}</div>
-          <p class="summary"><strong>Key Insight:</strong> ${q.summary}</p>
-          <div class="quotes">${q.quotes.map(t=>`<div class="quote">${t}</div>`).join('')}</div>
-          <button class="expand-button" onclick="toggleExpand(this)">View More</button>
-          <div class="expanded-content">
-            <h3>Deeper Insight</h3><p>${q.detailText}</p>
-            <h3>Focus Group Breakdown</h3>
-            <div class="chart-container"><canvas id="qd${q.id}"></canvas></div>
-            <div class="chart-data" id="breakData${q.id}"></div>
-          </div>`;
-        document.getElementById('insightsGrid').appendChild(card);
-        new Chart(document.getElementById(`qc${q.id}`),{type:types[i%types.length],data:{labels:['Positive','Neutral','Negative'],datasets:[{data:q.detailChart,backgroundColor:colors}]},options:{plugins:{datalabels:{formatter:v=>v+'%',color:'#fff'}},maintainAspectRatio:false}});
-        new Chart(document.getElementById(`qd${q.id}`),{type:types[(i+1)%types.length],data:{labels:q.breakdownLabels,datasets:[{data:q.breakdownValues,backgroundColor:colors}]},options:{plugins:{datalabels:{formatter:v=>v+'%',color:'#000'}},maintainAspectRatio:false}});
-        document.getElementById(`breakData${q.id}`).innerHTML = q.breakdownLabels.map((l,j)=>`${l}: ${q.breakdownValues[j]}%`).join(' | ');
+    // Register plugin
+    Chart.register(ChartDataLabels);
+
+    // Defaults
+    Chart.defaults.font.family = 'Inter';
+    Chart.defaults.font.size = 14;
+    Chart.defaults.plugins.legend.display = false;
+    Chart.defaults.plugins.datalabels = {
+      color:'#fff', anchor:'center', align:'center',
+      formatter:v=>v+'%'
+    };
+
+    // Colors
+    const qualColors = ['#2C3E50','#4A6470','#6F8D9F','#9FB6CC'];
+    const quantColors = ['#7C9461','#A3B0A4','#C8D9B3','#EDF1CD'];
+
+    // Data arrays
+    const QUAL_QUESTIONS = [
+      { title:'Overall Approval / Disapproval',
+        keyInsight:'42% approve vs. 53% disapprove, indicating a slight tilt toward disapproval.',
+        quotes:['“I’m proud of the economy.”','“I’m alarmed by the tone.”'],
+        deeperInsight:'Economic metrics drive support; controversies drive fatigue.',
+        sociologicalView:'Partisan identity vs. moderate stability needs.',
+        mainChart:{labels:['Approve','Disapprove','Undecided'],data:[42,53,5]},
+        breakdown:{labels:['Republicans','Independents','Democrats'],data:[88,30,12]} },
+      { title:'Main Concerns',
+        keyInsight:'70% of Independents feel anxious, outpacing 20% of Republicans and 80% of Democrats.',
+        quotes:['“Headlines stress me.”','“Details feel irrelevant.”'],
+        deeperInsight:'Drama amplifies anxiety across swing voters.',
+        sociologicalView:'Emotional exhaustion undermines policy engagement.',
+        mainChart:{labels:['Volatility','Calm','Neutral'],data:[70,20,10]},
+        breakdown:{labels:['Economy','Healthcare','Immigration'],data:[50,30,20]} },
+      { title:'Reasons for Dissatisfaction',
+        keyInsight:'85% of Democrats and 60% of Independents cite nonstop crises vs. 15% of Republicans.',
+        quotes:['“Nonstop crisis.”','“I yearn for calm.”'],
+        deeperInsight:'Continuous drama erodes trust.',
+        sociologicalView:'Opposition unites in fatigue.',
+        mainChart:{labels:['Crises','Policy','Tone'],data:[85,10,5]},
+        breakdown:{labels:['Republicans','Independents','Democrats'],data:[15,60,85]} },
+      { title:'Reasons for Satisfaction',
+        keyInsight:'85% of Republicans and 35% of Independents satisfied with economic performance vs. 15% of Democrats.',
+        quotes:['“Jobs are strong.”','“I appreciate growth.”'],
+        deeperInsight:'Economic optimism outweighs tone concerns.',
+        sociologicalView:'Financial security anchors approval.',
+        mainChart:{labels:['Economy','Leadership','Tone'],data:[85,10,5]},
+        breakdown:{labels:['Republicans','Independents','Democrats'],data:[85,35,15]} },
+      { title:'Overall Satisfaction Levels',
+        keyInsight:'88% of Republicans vs. 33% of Independents and 12% of Democrats express satisfaction.',
+        quotes:['“Proud but weary.”','“Mixed emotions.”'],
+        deeperInsight:'Satisfaction tempered by fatigue.',
+        sociologicalView:'Call for calm transcends party lines.',
+        mainChart:{labels:['Satisfied','Neutral','Dissatisfied'],data:[88,7,5]},
+        breakdown:{labels:['Republicans','Independents','Democrats'],data:[88,33,12]} },
+      { title:'What Could Change Minds',
+        keyInsight:'54% of Independents need reassurance vs. 48% of Republicans and 10% of Democrats.',
+        quotes:['“Need calm leadership.”','“Stability over spectacle.”'],
+        deeperInsight:'Reassurance shifts undecided voters.',
+        sociologicalView:'Empathy resonates with moderates.',
+        mainChart:{labels:['Reassurance','Policy','Tone'],data:[54,36,10]},
+        breakdown:{labels:['Republicans','Independents','Democrats'],data:[48,54,10]} },
+      { title:'Economy’s Role in Support',
+        keyInsight:'82% of Republicans and 53% of Independents prioritize economic control vs. 15% of Democrats.',
+        quotes:['“Jobs come first.”','“Wages matter most.”'],
+        deeperInsight:'Economic performance underpins approval.',
+        sociologicalView:'Security outweighs rhetoric.',
+        mainChart:{labels:['Approve Econ','Neutral','Disapprove'],data:[82,15,3]},
+        breakdown:{labels:['Republicans','Independents','Democrats'],data:[82,53,15]} },
+      { title:'Tone vs. Policy Importance',
+        keyInsight:'80% of Democrats and 70% of Independents say tone outweighs policy vs. 40% of Republicans.',
+        quotes:['“Words hurt.”','“Actions feel wrong.”'],
+        deeperInsight:'Emotional resonance guides perception.',
+        sociologicalView:'Narratives drive group sentiment.',
+        mainChart:{labels:['Tone','Policy','Neutral'],data:[75,20,5]},
+        breakdown:{labels:['Republicans','Independents','Democrats'],data:[40,70,80]} },
+      { title:'Cause of Approval Drop',
+        keyInsight:'10% of Independents and 12% of Democrats cite burnout vs. 6% of Republicans.',
+        quotes:['“Crisis fatigue.”','“Need a break.”'],
+        deeperInsight:'Fatigue prompts reevaluation.',
+        sociologicalView:'Long-term stress unites opponents.',
+        mainChart:{labels:['Fatigue','Policy','Other'],data:[11,4,85]},
+        breakdown:{labels:['Republicans','Independents','Democrats'],data:[6,10,12]} },
+      { title:'Approval by Education',
+        keyInsight:'48% of those without a degree vs. 29% of postgrads approve – higher education correlates with scrutiny.',
+        quotes:['“Demand consistency.”','“Flip-flops confuse me.”'],
+        deeperInsight:'Education shapes expectations.',
+        sociologicalView:'Nuanced analysis among graduates.',
+        mainChart:{labels:['NoDeg','College','Postgrad'],data:[48,35,29]},
+        breakdown:{labels:['No Degree','College','Postgrad'],data:[48,35,29]} },
+      { title:'Emotional Descriptors',
+        keyInsight:'90% of Republicans use “protector” vs. 5% of Democrats.',
+        quotes:['“He’s a lion.”','“I feel unsafe.”'],
+        deeperInsight:'Archetypal labels drive loyalty.',
+        sociologicalView:'Symbolism overrides policy.',
+        mainChart:{labels:['Protector','Other','None'],data:[90,7,3]},
+        breakdown:{labels:['Republicans','Independents','Democrats'],data:[90,40,5]} },
+      { title:'Emotional Language Usage',
+        keyInsight:'90% of Republicans use visceral labels vs. 5% of Democrats.',
+        quotes:['“Chaos incarnate.”','“Unapologetic.”'],
+        deeperInsight:'Language intensifies divisions.',
+        sociologicalView:'Narrative power over facts.',
+        mainChart:{labels:['Visceral','Neutral','None'],data:[90,7,3]},
+        breakdown:{labels:['Republicans','Independents','Democrats'],data:[90,30,5]} },
+      { title:'Symbolic Narratives',
+        keyInsight:'80% of MAGA, 70% of working-class, 60% of evangelicals resonate with rebellion frame.',
+        quotes:['“Fights the swamp.”','“Defends us.”'],
+        deeperInsight:'Cohesive stories sustain support.',
+        sociologicalView:'Shared identity over nuance.',
+        mainChart:{labels:['MAGA','Working','Evangelical'],data:[80,70,60]},
+        breakdown:{labels:['MAGA','Working-class','Evangelical'],data:[80,70,60]} }
+    ];
+
+    const QUANT_QUESTIONS = [
+      { title:'Overall Job Approval', labels:['Approve','Disapprove','Undecided'], data:[42,53,5] },
+      { title:'Economic Confidence', labels:['Very','Somewhat','Not very','Not at all','Undecided'], data:[20,25,15,37,3] },
+      { title:'Foreign Policy Satisfaction', labels:['Very','Somewhat','Neutral','Somewhat','Very','Undecided'], data:[12,26,9,20,35,8] },
+      { title:'Immigration Confidence', labels:['Very','Somewhat','Neutral','Not very','Not at all','Undecided'], data:[22,22,6,18,32,6] },
+      { title:'Trade Satisfaction', labels:['Very','Somewhat','Neutral','Somewhat','Very','Undecided'], data:[10,24,8,18,30,10] },
+      { title:'Executive Tariff Authority', labels:['Yes','No','Undecided'], data:[32,60,8] },
+      { title:'Healthcare Satisfaction', labels:['Very','Somewhat','Neutral','Somewhat','Very','Undecided'], data:[11,25,6,20,38,6] },
+      { title:'Tone & Communication Style', labels:['Too aggressive','Appropriate','Too passive'], data:[54,39,7] },
+      { title:'Approval by Affiliation', labels:['Republican','Independent','Democrat'], data:[88,30,12] },
+      { title:'Approval by Age', labels:['18–29','30–44','45–64','65+'], data:[33,38,47,52] },
+      { title:'Approval by Education', labels:['No Degree','College','Postgrad'], data:[48,35,29] },
+      { title:'Approval by Race', labels:['White','Black','Hispanic','Asian'], data:[51,13,28,31] },
+      { title:'Global Conflicts Confidence', labels:['Very','Somewhat','Neutral','Not very','Not at all'], data:[15,18,10,25,32] },
+      { title:'Social Endorsements', labels:['Strongly approve','Somewhat approve','Neutral','Somewhat disapprove','Strongly disapprove'], data:[10,15,33,20,22] }
+    ];
+
+    // Render qualitative cards
+    QUAL_QUESTIONS.forEach((q,i)=>{
+      const idx=i+1, grid=document.getElementById('qual-grid');
+      const card=document.createElement('div'); card.className='card';
+      card.innerHTML=`
+        <h3>${idx}. ${q.title}</h3>
+        <p><strong>Key Insight:</strong> ${q.keyInsight}</p>
+        <div class="quote">${q.quotes[0]}</div>
+        <div class="quote">${q.quotes[1]}</div>
+        <canvas id="qualChart${idx}"></canvas>
+        <button class="view-btn" id="btnQual${idx}">View Details</button>
+        <div class="view-content" id="viewQual${idx}">
+          <h4>Focus-Group Breakdown</h4>
+          <table>
+            <tr><th>Subgroup</th><th>%</th></tr>
+            ${q.breakdown.labels.map((l,j)=>`<tr><td>${l}</td><td>${q.breakdown.data[j]}%</td></tr>`).join('')}
+          </table>
+          <p><strong>Deeper Insight:</strong> ${q.deeperInsight}</p>
+          <p><strong>Sociological View:</strong> ${q.sociologicalView}</p>
+        </div>`;
+      grid.appendChild(card);
+      new Chart(document.getElementById(`qualChart${idx}`),{
+        type:'doughnut',
+        data:{labels:q.mainChart.labels,datasets:[{data:q.mainChart.data,backgroundColor:qualColors}]},
+        options:{responsive:true,cutout:'60%'}
       });
-      // Quantitative
-      const quantitative = [
-        {id:1,title:'Overall Job Approval',labels:['Approve','Disapprove','No Opinion'],vals:[42,53,5]},
-        {id:2,title:'Economic Confidence',labels:['Very','Somewhat','Not Very','Not at All','No Opinion'],vals:[20,25,15,37,3]},
-        {id:3,title:'Foreign Policy Satisfaction',labels:['Very','Somewhat','Neutral','Somewhat Dissatisfied','Very Dissatisfied','No Opinion'],vals:[12,26,9,20,35,8]},
-        {id:4,title:'Immigration Handling',labels:['Very','Somewhat','Neutral','Not Very','Not At All','No Opinion'],vals:[22,22,6,18,32,6]},
-        {id:5,title:'Tariffs & Trade',labels:['Very','Somewhat','Neutral','Somewhat Dissatisfied','Very Dissatisfied','No Opinion'],vals:[10,24,8,18,30,10]},
-        {id:6,title:'Exec Tariff Authority',labels:['Yes','No','No Opinion'],vals:[32,60,8]},
-        {id:7,title:'Healthcare Satisfaction',labels:['Very','Somewhat','Neutral','Somewhat Dissatisfied','Very Dissatisfied','No Opinion'],vals:[11,25,6,20,38,6]},
-        {id:8,title:'Tone & Communication',labels:['Too Aggressive','Appropriate','Too Passive'],vals:[54,39,7]},
-        {id:9,title:'Approval by Affiliation',labels:['Republicans','Independents','Democrats'],vals:[88,30,12]},
-        {id:10,title:'Approval by Age',labels:['18–29','30–44','45–64','65+'],vals:[33,38,47,52]},
-        {id:11,title:'Approval by Education',labels:['No College','College','Postgraduate'],vals:[48,35,29]},
-        {id:12,title:'Approval by Race',labels:['White','Black','Hispanic','Asian'],vals:[51,13,28,31]},
-        {id:13,title:'Global Conflicts Response',labels:['Very','Somewhat','Neutral','Not Very','Not at All'],vals:[15,18,10,25,32]},
-        {id:14,title:'Musk & Dogecoin Endorsements',labels:['Strongly Approve','Somewhat Approve','Neutral','Somewhat Disapprove','Strongly Disapprove'],vals:[10,15,33,20,22]}
-      ];
-      quantitative.forEach((q,i) => {
-        const card = document.createElement('div'); card.className = 'card';
-        card.innerHTML = `
-          <h2>Q${q.id}: ${q.title}</h2>
-          <div class="chart-container"><canvas id="qq${q.id}"></canvas></div>
-          <div class="chart-data">${q.labels.map((l,j)=>`${l}: ${q.vals[j]}%`).join(' | ')}</div>`;
-        document.getElementById('quantGrid').appendChild(card);
-        new Chart(document.getElementById(`qq${q.id}`),{type:types[i%types.length],data:{labels:q.labels,datasets:[{data:q.vals,backgroundColor:colors}]},options:{plugins:{datalabels:{formatter:v=>v+'%',color:'#000'}},scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}},maintainAspectRatio:false}});
+      document.getElementById(`btnQual${idx}`).onclick=()=>{
+        document.getElementById(`viewQual${idx}`).classList.toggle('open');
+        document.getElementById(`btnQual${idx}`).classList.toggle('expanded');
+      };
+    });
+
+    // Render quantitative cards
+    QUANT_QUESTIONS.forEach((q,i)=>{
+      const idx=i+1, grid=document.getElementById('quant-grid');
+      const card=document.createElement('div'); card.className='card';
+      card.innerHTML=`
+        <h3>${idx}. ${q.title}</h3>
+        <canvas id="quantChart${idx}"></canvas>
+        <table>
+          <tr><th>Response</th><th>%</th></tr>
+          ${q.labels.map((l,j)=>`<tr><td>${l}</td><td>${q.data[j]}%</td></tr>`).join('')}
+        </table>`;
+      grid.appendChild(card);
+      new Chart(document.getElementById(`quantChart${idx}`),{
+        type:'pie',
+        data:{labels:q.labels,datasets:[{data:q.data,backgroundColor:quantColors}]},
+        options:{responsive:true}
       });
     });
   </script>
+</body>
+</html>
+<!-- partial -->
+  
 </body>
 </html>
