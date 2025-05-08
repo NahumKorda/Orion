@@ -1,0 +1,31 @@
+survey_result_analysis:
+  description: >
+    Identify and extract all survey questions from the provided text, along with their corresponding answer options and the values associated with each option. Determine whether the values represent counts or percentages.
+  expected_output: >
+    The task should return a JSON object structured as follows:
+  
+    {
+      "questions": [
+        {
+          "question": "Text of the survey question",
+          "data_type": "Percent or Count",
+          "answers": [
+            {
+              "answer": "Text of the answer option",
+              "value": Numeric value (either a count or a percentage)
+            }
+          ]
+        }
+      ]
+    }
+    
+    **Details:**
+    
+    * `"question"`: A string containing the full text of the survey question.
+    * `"data_type"`: A string that must be either `"Percent"` or `"Count"`, indicating the type of value reported.
+    * `"answers"`: An array of objects, each with:
+    
+      * `"answer"`: The text of the answer option.
+      * `"value"`: A numerical representation (integer or float) of either the count or the percentage.
+
+  agent: survey_analyst

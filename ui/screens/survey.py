@@ -1,10 +1,27 @@
+import json
+import os
 import streamlit as st
 
+from agents.questions.crew import SurveyAnalyzingCrew
 from ui.screens.html import reduced_title_padding
+from ui.utils import get_data_path
+from utils.pdf_reader import get_text
+
+
+def process_file(file_path: str):
+    survey_results = get_text(file_path)
+    inputs = {
+        'survey_results': survey_results
+    }
+    raw_results = SurveyAnalyzingCrew().crew().kickoff(inputs=inputs)
+    results = raw_results.json
+    print(f"RESULTS:\n{results}")
+
+    # Store results in session state for further processing
+    st.session_state.survey_results = results
 
 
 def show_survey_screen():
-
     st.markdown(reduced_title_padding(), unsafe_allow_html=True)
 
     # Create a centered container with 50% width
@@ -33,15 +50,36 @@ def show_survey_screen():
 
             with tab1:
                 st.subheader("Upload your survey document")
+
+                # Modified file uploader to accept only PDF files
                 uploaded_file = st.file_uploader("Choose a file",
-                                                 type=["docx", "pdf", "txt", "csv"],
-                                                 help="Upload your survey document",
+                                                 type=["pdf"],
+                                                 help="Upload your survey document (PDF only)",
                                                  key='survey_uploader')
 
                 if uploaded_file is not None:
-                    st.success(f"File '{uploaded_file.name}' successfully uploaded!")
-                    # Store the file in session state
-                    st.session_state.survey_data['uploaded_file'] = uploaded_file.name
+                    # Create downloads directory if it doesn't exist
+                    data_path = get_data_path()
+                    downloads_path = os.path.join(data_path, "downloads")
+                    os.makedirs(downloads_path, exist_ok=True)
+
+                    # Save the uploaded file to the downloads folder
+                    file_path = os.path.join(downloads_path, uploaded_file.name)
+                    with open(file_path, "wb") as f:
+                        f.write(uploaded_file.getbuffer())
+
+                    # Process the file and store results in session state
+                    process_file(file_path)
+
+                    st.success(f"File '{uploaded_file.name}' successfully uploaded and processed!")
+
+                    # Store the file path in session state
+                    st.session_state.survey_data['uploaded_file'] = file_path
+
+                    # Show a preview of the results if available
+                    if 'survey_results' in st.session_state:
+                        with st.expander("Preview of Processed Results", expanded=False):
+                            st.json(st.session_state.survey_results)
 
             with tab2:
                 st.subheader("Enter your survey questions")
