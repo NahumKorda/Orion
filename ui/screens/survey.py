@@ -2,6 +2,7 @@ import json
 import os
 import streamlit as st
 
+from agents.keywords.crew import KeywordExtractingCrew
 from agents.questions.crew import SurveyAnalyzingCrew
 from ui.screens.html import reduced_title_padding
 from ui.utils import get_data_path
@@ -9,16 +10,107 @@ from utils.pdf_reader import get_text
 
 
 def process_file(file_path: str):
+    """Process the uploaded file and extract survey data"""
     survey_results = get_text(file_path)
     inputs = {
         'survey_results': survey_results
     }
     raw_results = SurveyAnalyzingCrew().crew().kickoff(inputs=inputs)
-    results = raw_results.json
-    print(f"RESULTS:\n{results}")
+    raw_keywords = KeywordExtractingCrew().crew().kickoff(inputs=inputs)
 
-    # Store results in session state for further processing
-    st.session_state.survey_results = results
+    try:
+        results = json.loads(raw_results.json)
+        keywords = json.loads(raw_keywords.json)
+
+        # Store results and file path in session state
+        st.session_state.survey_results = results
+        st.session_state.survey_data['uploaded_file'] = file_path
+
+        # Store keywords
+        st.session_state.filters = {
+            'keywords': keywords,
+            'sentiment': [],
+        }
+
+        # Directly populate questions now instead of using a flag
+        populate_questions_from_results(results)
+
+        # Mark as processed and set the tab
+        st.session_state.file_processed = True
+        st.session_state.active_tab = 1  # Index for "Enter Questions" tab
+
+        return True
+    except Exception as e:
+        st.error(f"Error processing survey data: {str(e)}")
+        return False
+
+
+def populate_questions_from_results(results):
+    """Convert processed survey results to the format needed for the manual entry form"""
+    if 'questions' not in results:
+        st.warning("The processed results don't contain the expected 'questions' key.")
+        return
+
+    # Clear existing questions
+    st.session_state.survey_data['questions'] = []
+
+    # Add each question from the results
+    for q in results.get('questions', []):
+        # Extract and normalize data_type
+        data_type = q.get('data_type', 'Percent')
+        # Ensure data_type is one of the valid options
+        if data_type.lower() == "percent":
+            data_type = "Percent"
+        elif data_type.lower() == "count":
+            data_type = "Count"
+        else:
+            data_type = "Percent"
+
+        question_data = {
+            'question': q.get('question', ''),
+            'data_type': data_type,
+            'answers': []
+        }
+
+        # Add each answer
+        for ans in q.get('answers', []):
+            question_data['answers'].append({
+                'answer': ans.get('answer', ''),
+                'value': float(ans.get('value', 0))
+            })
+
+        # If no answers were found, add an empty one
+        if not question_data['answers']:
+            question_data['answers'].append({'answer': '', 'value': 0})
+
+        st.session_state.survey_data['questions'].append(question_data)
+
+    # If no questions were found, add an empty one
+    if not st.session_state.survey_data['questions']:
+        st.session_state.survey_data['questions'].append({
+            'question': '',
+            'data_type': 'Percent',
+            'answers': [{'answer': '', 'value': 0}]
+        })
+
+
+def is_survey_data_valid():
+    """Check if the survey data is valid for proceeding to the next screen"""
+    # Check if we have at least one question
+    if not st.session_state.survey_data['questions']:
+        return False
+
+    # For manually entered questions, check if at least one question has content
+    for question in st.session_state.survey_data['questions']:
+        # Check if question text exists and is not just whitespace
+        if question.get('question') and question.get('question').strip():
+            # Check if at least one answer has content
+            for answer in question.get('answers', []):
+                if answer.get('answer') and answer.get('answer').strip():
+                    return True
+
+    # If we got here without returning True, then no valid questions were found
+    return False
 
 
 def show_survey_screen():
@@ -45,13 +137,25 @@ def show_survey_screen():
                     'answers': [{'answer': '', 'value': 0}]
                 })
 
-            # Create tabs for the two input modes
-            tab1, tab2 = st.tabs(["Upload Survey", "Enter Questions"])
+            # Initialize active tab index (using integer for simplicity)
+            if 'active_tab' not in st.session_state:
+                st.session_state.active_tab = 0  # Default to Upload Survey tab
 
-            with tab1:
+            # Create tabs and set the active tab
+            tab_titles = ["Upload Survey", "Enter Questions"]
+            tabs = st.tabs(tab_titles)
+
+            # Show success message if we just processed a file
+            if st.session_state.get('file_processed', False):
+                st.success("Survey data successfully processed! You can now edit the extracted questions.")
+                # Reset the flag to prevent showing the message on every refresh
+                st.session_state.file_processed = False
+
+            # Tab 0: Upload Survey
+            with tabs[0]:
                 st.subheader("Upload your survey document")
 
-                # Modified file uploader to accept only PDF files
+                # File uploader for PDF files
                 uploaded_file = st.file_uploader("Choose a file",
                                                  type=["pdf"],
                                                  help="Upload your survey document (PDF only)",
@@ -68,27 +172,15 @@ def show_survey_screen():
                     with open(file_path, "wb") as f:
                         f.write(uploaded_file.getbuffer())
 
-                    # Process the file and store results in session state
-                    process_file(file_path)
+                    # Process button to give user control over when processing happens
+                    if st.button("Process Survey"):
+                        with st.spinner("Processing survey data..."):
+                            if process_file(file_path):
+                                st.rerun()
 
-                    st.success(f"File '{uploaded_file.name}' successfully uploaded and processed!")
-
-                    # Store the file path in session state
-                    st.session_state.survey_data['uploaded_file'] = file_path
-
-                    # Show a preview of the results if available
-                    if 'survey_results' in st.session_state:
-                        with st.expander("Preview of Processed Results", expanded=False):
-                            st.json(st.session_state.survey_results)
-
-            with tab2:
+            # Tab 1: Enter Questions
+            with tabs[1]:
                 st.subheader("Enter your survey questions")
-
-                # Survey title
-                st.session_state.survey_data['title'] = st.text_input(
-                    "Survey Title",
-                    value=st.session_state.survey_data.get('title', '')
-                )
 
                 # Display questions with their answers
                 for q_idx, question in enumerate(st.session_state.survey_data['questions']):
@@ -104,10 +196,15 @@ def show_survey_screen():
                             )
 
                         with q_col2:
+                            # Get the current data type and determine the index
+                            current_data_type = question.get('data_type', 'Percent')
+                            data_type_index = 0 if current_data_type == 'Percent' else 1
+
+                            # Set the selectbox with the correct index
                             question['data_type'] = st.selectbox(
                                 "Data type",
                                 options=["Percent", "Count"],
-                                index=0 if question.get('data_type') == 'Percent' else 1,
+                                index=data_type_index,
                                 key=f"dtype_{q_idx}"
                             )
 
@@ -118,16 +215,18 @@ def show_survey_screen():
 
                             with ans_col1:
                                 answer['answer'] = st.text_input(
-                                    "Answer" if a_idx == 0 else "",
+                                    "Answer",
                                     value=answer.get('answer', ''),
-                                    key=f"q{q_idx}_a{a_idx}"
+                                    key=f"q{q_idx}_a{a_idx}",
+                                    label_visibility="collapsed"
                                 )
 
                             with ans_col2:
                                 answer['value'] = st.number_input(
-                                    "Value" if a_idx == 0 else "",
+                                    "Value",
                                     value=float(answer.get('value', 0)),
-                                    key=f"q{q_idx}_v{a_idx}"
+                                    key=f"q{q_idx}_v{a_idx}",
+                                    label_visibility="collapsed"
                                 )
 
                             # Delete answer button (don't show for first answer)
@@ -142,8 +241,8 @@ def show_survey_screen():
                             question['answers'].append({'answer': '', 'value': 0})
                             st.rerun()
 
-                    # Delete question button (don't show for first question)
-                    if q_idx > 0:
+                    # Delete question button (don't show for first question or if it's the only question)
+                    if len(st.session_state.survey_data['questions']) > 1:
                         if st.button("❌ Delete Question", key=f"del_q_{q_idx}", help="Delete question"):
                             st.session_state.survey_data['questions'].pop(q_idx)
                             st.rerun()
@@ -157,20 +256,30 @@ def show_survey_screen():
                     })
                     st.rerun()
 
-                # Debug - show current data structure
-                if st.checkbox("Show JSON Data"):
-                    st.json(st.session_state.survey_data)
-
             st.markdown("---")
 
             back_col, next_col = st.columns(2)
 
-            # Create regular "Next" button in the right column
+            # Create "Next" button in the right column, enabled only if survey data is valid
             with next_col:
-                if st.button("Next", key="survey_next", use_container_width=True):
-                    # Validate data here if needed
-                    if 'validated' not in st.session_state:
-                        st.session_state.validated = {}
-                    st.session_state.validated['Survey'] = True
-                    st.session_state.current_screen = 'filters'
-                    st.rerun()
+                # Check if data is valid for proceeding
+                is_valid = is_survey_data_valid()
+
+                # Create the button, enabled only if data is valid
+                if is_valid:
+                    if st.button("Next", key="survey_next", use_container_width=True):
+                        # Validate data here if needed
+                        if 'validated' not in st.session_state:
+                            st.session_state.validated = {}
+                        st.session_state.validated['Survey'] = True
+                        st.session_state.current_screen = 'filters'
+                        st.rerun()
+                else:
+                    # Display disabled button with tooltip
+                    st.button(
+                        "Next",
+                        key="survey_next_disabled",
+                        use_container_width=True,
+                        disabled=True,
+                        help="Please upload survey results or enter them manually"
+                    )

@@ -1,0 +1,18 @@
+survey_result_analysis:
+  description: >
+    Identify and extract major keywords from the provided text. A keyword should not be longer than 5 words.
+  expected_output: >
+    The task should return a JSON object structured as follows:
+  
+    {
+      "keywords": [
+         "keyword"
+      ]
+    }
+    
+    **Details:**
+    
+    * `"keywords"`: A list containing at most 10 extracted keywords.
+    * `"keyword"`: A string containing an extracted keyword no longer than 5 words.
+
+  agent: survey_analyst
