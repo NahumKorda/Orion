@@ -1,14 +1,11 @@
 import streamlit as st
 
 from ui.screens.html import reduced_title_padding
-from ui.utils import PREDEFINED_QUESTIONS
-
 
 def show_questions_screen():
 
     st.markdown(reduced_title_padding(), unsafe_allow_html=True)
 
-    # Create a centered container with 50% width
     container = st.container()
     with container:
         col1, col2, col3 = st.columns([1, 2, 1])
@@ -23,17 +20,28 @@ def show_questions_screen():
             if 'custom_questions' not in st.session_state:
                 st.session_state.custom_questions = []
 
-            # Display predefined questions with checkboxes
+            # Extract questions from survey_results
+            survey_questions = []
+            if 'survey_results' in st.session_state and 'questions' in st.session_state.survey_results:
+                for q in st.session_state.survey_results.get('questions', []):
+                    question_text = q.get('question', '')
+                    if question_text:  # Only add non-empty questions
+                        survey_questions.append(question_text)
+
+            # Display questions from survey_results with checkboxes
             st.subheader("Select Questions")
 
-            for i, question in enumerate(PREDEFINED_QUESTIONS):
-                checked = question in st.session_state.selected_questions
-                if st.checkbox(question, value=checked, key=f"question_checkbox_{i}"):
-                    if question not in st.session_state.selected_questions:
-                        st.session_state.selected_questions.append(question)
-                else:
-                    if question in st.session_state.selected_questions:
-                        st.session_state.selected_questions.remove(question)
+            if not survey_questions:
+                st.info("No questions found in survey results.")
+            else:
+                for i, question in enumerate(survey_questions):
+                    checked = question in st.session_state.selected_questions
+                    if st.checkbox(question, value=checked, key=f"question_checkbox_{i}"):
+                        if question not in st.session_state.selected_questions:
+                            st.session_state.selected_questions.append(question)
+                    else:
+                        if question in st.session_state.selected_questions:
+                            st.session_state.selected_questions.remove(question)
 
             # Section for custom questions
             st.markdown("---")

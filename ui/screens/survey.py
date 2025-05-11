@@ -28,7 +28,7 @@ def process_file(file_path: str):
 
         # Store keywords
         st.session_state.filters = {
-            'keywords': keywords,
+            'keywords': keywords["keywords"],
             'sentiment': [],
         }
 

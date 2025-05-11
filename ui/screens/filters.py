@@ -4,7 +4,6 @@ from ui.screens.html import reduced_title_padding
 
 
 def show_filters_screen():
-
     st.markdown(reduced_title_padding(), unsafe_allow_html=True)
 
     # Create a centered container with 50% width
@@ -21,6 +20,25 @@ def show_filters_screen():
                     'sentiment': [],
                 }
 
+            # Extract keywords correctly based on their structure
+            keywords = []
+            if 'keywords' in st.session_state.filters:
+                # Check if keywords is a dictionary with numeric keys
+                if isinstance(st.session_state.filters['keywords'], dict):
+                    # It's a dictionary, so extract values
+                    for key, value in st.session_state.filters['keywords'].items():
+                        if isinstance(value, str):
+                            keywords.append(value)
+                elif isinstance(st.session_state.filters['keywords'], list):
+                    # It's already a list, use it directly
+                    keywords = st.session_state.filters['keywords']
+                elif isinstance(st.session_state.filters['keywords'], str):
+                    # It's a single string, convert to list
+                    keywords = [st.session_state.filters['keywords']]
+
+                # Update the keywords in session state to ensure correct format
+                st.session_state.filters['keywords'] = keywords
+
             # Define callback functions for each filter type
             def add_filter_item(filter_key):
                 input_key = f"text_{filter_key}"
@@ -28,18 +46,6 @@ def show_filters_screen():
                     filter_key]:
                     st.session_state.filters[filter_key].append(st.session_state[input_key])
                     st.session_state[input_key] = ""  # Clear the input
-
-            # Check if survey was uploaded to show "Generate Automatically" button
-            if st.session_state.survey_data.get('uploaded_file'):
-                col1, col2 = st.columns([9, 1])
-                with col2:
-                    if st.button("Generate Automatically", key="gen_auto"):
-                        # Simulate auto-generation with some sample data
-                        st.session_state.filters = {
-                            'keywords': ['election', 'policy', 'candidate'],
-                            'sentiment': ['positive', 'negative', 'neutral'],
-                        }
-                        st.rerun()
 
             # Create sections for each filter type
             filter_sections = [
@@ -61,14 +67,18 @@ def show_filters_screen():
                                 st.session_state.filters[key].pop(i)
                                 st.rerun()
 
+                    # Add space after the last item if there are any items
+                    if st.session_state.filters[key]:
+                        st.markdown("<br>", unsafe_allow_html=True)
+
                     # Add new item using the callback approach
                     col1, col2 = st.columns([10, 1], vertical_alignment="bottom")
                     with col1:
-                        new_item = st.text_input(f"Add {title.lower()}",
-                                                 placeholder=placeholder,
-                                                 key=f"text_{key}",
-                                                 on_change=add_filter_item,
-                                                 args=(key,))
+                        st.text_input(f"Add {title.lower()}",
+                                      placeholder=placeholder,
+                                      key=f"text_{key}",
+                                      on_change=add_filter_item,
+                                      args=(key,))
                     with col2:
                         if st.button("➕", key=f"add_{key}", help="Add item"):
                             add_filter_item(key)
@@ -90,3 +100,5 @@ def show_filters_screen():
                     st.session_state.validated['Filters'] = True
                     st.session_state.current_screen = 'questions'
                     st.rerun()
+
+    st.markdown("<br><br>", unsafe_allow_html=True)

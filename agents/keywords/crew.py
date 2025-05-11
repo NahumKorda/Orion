@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 
 class OutputJSON(BaseModel):
-	questions: list[str] = Field(..., description="A list of extracted keywords.")
+	keywords: list[str] = Field(..., description="A list of extracted keywords.")
 
 
 @CrewBase
