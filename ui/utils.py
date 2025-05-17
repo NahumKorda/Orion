@@ -1,18 +1,17 @@
-# Predefined questions list for the Questions screen
 import os
 from pathlib import Path
 
 PREDEFINED_QUESTIONS = [
-    "What primarily motivates each group's choice?",
-    "What else influences each group's choice?",
-    "What is the percentage of undecided in each group?",
-    "Where are the core supporters in each group?",
-    "What are the key concerns for each demographic?",
-    "How do economic factors influence voting patterns?",
-    "What communication channels are most effective for each group?",
-    "How do regional differences affect political alignments?",
-    "What policy areas generate the most engagement?",
-    "How has sentiment shifted over the past election cycle?"
+    "How would you rate the current job performance of the President of the United States?",
+    "What issues or challenges do you believe are most pressing for the country right now?",
+    "What specific factors contribute to your disapproval of the President’s performance, if any?",
+    "Overall, how satisfied are you with the current direction in which the country is heading?",
+    "What developments or changes, if any, would lead you to reconsider your current opinion of the President?",
+    "To what extent does the state of the economy influence your support for the President?",
+    "When evaluating the President, which do you prioritize more: their communication style or their policy decisions?",
+    "How does level of education relate to approval or disapproval of the President, based on your view or experience?",
+    "What emotions best describe how you feel about the President (e.g., hopeful, angry, proud, anxious)?",
+    "How do individuals across different political affiliations emotionally describe the current state of the nation?"
 ]
 
 
